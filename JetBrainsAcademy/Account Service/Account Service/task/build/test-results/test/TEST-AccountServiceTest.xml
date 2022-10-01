@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="AccountServiceTest" tests="1" skipped="0" failures="0" errors="0" timestamp="2022-10-01T02:06:11" hostname="MACC02DC239MD6N" time="2.466">
+  <properties/>
+  <testcase name="start" classname="AccountServiceTest" time="2.466"/>
+  <system-out><![CDATA[?[1;31m
+Start test 1?[0m
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+ :: Spring Boot ::        (v2.3.1.RELEASE)
+
+2022-09-30 22:06:11.835  INFO 13785 --- [    Test worker] account.AccountServiceApplication        : Starting AccountServiceApplication on MACC02DC239MD6N with PID 13785 (started by ryo in /Users/ryo/Documents/Playground/Java/SpringShipwreck/Account Service/Account Service/task)
+2022-09-30 22:06:11.838  INFO 13785 --- [    Test worker] account.AccountServiceApplication        : No active profile set, falling back to default profiles: default
+2022-09-30 22:06:12.755  INFO 13785 --- [    Test worker] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port(s): 28852 (http)
+2022-09-30 22:06:12.763  INFO 13785 --- [    Test worker] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2022-09-30 22:06:12.763  INFO 13785 --- [    Test worker] org.apache.catalina.core.StandardEngine  : Starting Servlet engine: [Apache Tomcat/9.0.36]
+2022-09-30 22:06:12.842  INFO 13785 --- [    Test worker] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
+2022-09-30 22:06:12.842  INFO 13785 --- [    Test worker] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 974 ms
+2022-09-30 22:06:13.049  INFO 13785 --- [    Test worker] o.s.s.concurrent.ThreadPoolTaskExecutor  : Initializing ExecutorService 'applicationTaskExecutor'
+2022-09-30 22:06:13.284  INFO 13785 --- [    Test worker] o.s.b.a.e.web.EndpointLinksResolver      : Exposing 14 endpoint(s) beneath base path '/actuator'
+2022-09-30 22:06:13.321  INFO 13785 --- [    Test worker] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port(s): 28852 (http) with context path ''
+2022-09-30 22:06:13.332  INFO 13785 --- [    Test worker] account.AccountServiceApplication        : Started AccountServiceApplication in 1.735 seconds (JVM running for 2.358)
+2022-09-30 22:06:13.623  INFO 13785 --- [io-28852-exec-1] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring DispatcherServlet 'dispatcherServlet'
+2022-09-30 22:06:13.623  INFO 13785 --- [io-28852-exec-1] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
+2022-09-30 22:06:13.628  INFO 13785 --- [io-28852-exec-1] o.s.web.servlet.DispatcherServlet        : Completed initialization in 5 ms
+?[1;31m
+Start test 2?[0m
+?[1;31m
+Start test 3?[0m
+?[1;31m
+Start test 4?[0m
+?[1;31m
+Start test 5?[0m
+?[1;31m
+Start test 6?[0m
+2022-09-30 22:06:13.729  WARN 13785 --- [io-28852-exec-6] .w.s.m.s.DefaultHandlerExceptionResolver : Resolved [org.springframework.http.converter.HttpMessageNotReadableException: JSON parse error: Email must be of domain 'acme.com'; nested exception is com.fasterxml.jackson.databind.JsonMappingException: Email must be of domain 'acme.com'
+ at [Source: (PushbackInputStream); line: 1, column: 41] (through reference chain: account.UserRegRequestCM["email"])]
+?[1;31m
+Start test 7?[0m
+?[1;31m
+Start test 8?[0m
+?[1;31m
+Start test 9?[0m
+?[1;31m
+Start test 10?[0m
+2022-09-30 22:06:13.773  WARN 13785 --- [o-28852-exec-10] .w.s.m.s.DefaultHandlerExceptionResolver : Resolved [org.springframework.http.converter.HttpMessageNotReadableException: JSON parse error: Email must be of domain 'acme.com'; nested exception is com.fasterxml.jackson.databind.JsonMappingException: Email must be of domain 'acme.com'
+ at [Source: (PushbackInputStream); line: 1, column: 41] (through reference chain: account.UserRegRequestCM["email"])]
+?[1;31m
+Start test 11?[0m
+2022-09-30 22:06:13.780  WARN 13785 --- [io-28852-exec-1] .w.s.m.s.DefaultHandlerExceptionResolver : Resolved [org.springframework.http.converter.HttpMessageNotReadableException: JSON parse error: Email must be of domain 'acme.com'; nested exception is com.fasterxml.jackson.databind.JsonMappingException: Email must be of domain 'acme.com'
+ at [Source: (PushbackInputStream); line: 1, column: 41] (through reference chain: account.UserRegRequestCM["email"])]
+?[1;31m
+Start test 12?[0m
+2022-09-30 22:06:13.789  WARN 13785 --- [io-28852-exec-2] .w.s.m.s.DefaultHandlerExceptionResolver : Resolved [org.springframework.web.HttpRequestMethodNotSupportedException: Request method 'GET' not supported]
+2022-09-30 22:06:13.796  WARN 13785 --- [io-28852-exec-3] .w.s.m.s.DefaultHandlerExceptionResolver : Resolved [org.springframework.web.HttpRequestMethodNotSupportedException: Request method 'PUT' not supported]
+2022-09-30 22:06:13.801  WARN 13785 --- [io-28852-exec-4] .w.s.m.s.DefaultHandlerExceptionResolver : Resolved [org.springframework.web.HttpRequestMethodNotSupportedException: Request method 'DELETE' not supported]
+?[1;31m
+Start test 13?[0m
+]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>
