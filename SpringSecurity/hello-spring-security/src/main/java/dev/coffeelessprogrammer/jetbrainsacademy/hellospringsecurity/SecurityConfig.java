@@ -24,9 +24,10 @@ public class SecurityConfig {
     @Bean
     SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.authorizeRequests()
+                .mvcMatchers("/public").permitAll()
+                .mvcMatchers("/").anonymous()
                 .mvcMatchers("/heal").hasRole("NURSE")
                 .mvcMatchers("/service").hasAnyRole("NURSE", "ADMIN")
-                .mvcMatchers("/", "/public").permitAll()
                 .mvcMatchers("/actuator/**").hasAuthority("MONITORING")
                 .mvcMatchers("/**").authenticated()  // or .anyRequest().authenticated()
                 .and().formLogin()
