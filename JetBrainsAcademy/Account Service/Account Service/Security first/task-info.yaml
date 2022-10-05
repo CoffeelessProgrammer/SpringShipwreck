@@ -518,6 +518,396 @@ files:
       };
     }
   learner_created: false
+- name: src/account/validation/ContractModelValidator.java
+  visible: true
+  text: |
+    package account.validation;
+
+    import account.contracts.UserRegistrationCM;
+
+    public class ContractModelValidator {
+
+        public static boolean validate(UserRegistrationCM cm) {
+            if(cm.getName() == null || cm.getName().isBlank())
+                throw new IllegalArgumentException("name must not be blank");
+            if(cm.getLastname() == null || cm.getLastname().isBlank())
+                throw new IllegalArgumentException("lastname must not be blank");
+            if(cm.getEmail() == null || !cm.getEmail().endsWith("@acme.com"))
+                throw new IllegalArgumentException("invalid email");
+            if(cm.getPassword() == null || cm.getPassword().isBlank())
+                throw new IllegalArgumentException("password must not be blank");
+
+            return true;
+        }
+    }
+  learner_created: true
+- name: src/account/models/Authority.java
+  visible: true
+  text: |
+    package account.models;
+
+    import lombok.AllArgsConstructor;
+    import lombok.Data;
+    import org.springframework.security.core.GrantedAuthority;
+
+    import javax.persistence.Embeddable;
+
+    @Data
+    @AllArgsConstructor
+    @Embeddable
+    public class Authority implements GrantedAuthority {
+
+        private String authority;
+    }
+  learner_created: true
+- name: src/account/controllers/UserMgmtAPI.java
+  visible: true
+  text: |
+    package account.controllers;
+
+    import account.services.UserEntityManager;
+    import account.contracts.UserRegistrationCM;
+    import account.contracts.UserRegResponseCM;
+    import account.models.UserEntity;
+    import account.validation.ContractModelValidator;
+    import org.springframework.beans.factory.annotation.Autowired;
+    import org.springframework.http.HttpStatus;
+    import org.springframework.http.ResponseEntity;
+    import org.springframework.web.bind.annotation.PostMapping;
+    import org.springframework.web.bind.annotation.RequestBody;
+    import org.springframework.web.bind.annotation.RequestMapping;
+    import org.springframework.web.bind.annotation.RestController;
+    import org.springframework.web.server.ResponseStatusException;
+
+    @RestController
+    @RequestMapping("/api/auth")
+    public class UserMgmtAPI {
+
+        @Autowired
+        UserEntityManager usersService;
+
+        @PostMapping("/signup")
+        ResponseEntity<UserRegResponseCM> userRegistration(@RequestBody UserRegistrationCM request) {
+            UserEntity newUser;
+
+            try {
+                ContractModelValidator.validate(request);
+                newUser = usersService.createUser(new UserEntity(request));
+            } catch (IllegalArgumentException exception) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+            }
+
+            return new ResponseEntity<UserRegResponseCM>(new UserRegResponseCM(newUser), HttpStatus.OK);
+        }
+
+    }
+  learner_created: true
+- name: src/account/services/UsersServiceImpl.java
+  visible: true
+  text: |
+    package account.services;
+
+    import account.models.UserEntity;
+    import account.validation.UsernameExistsException;
+    import org.springframework.beans.factory.annotation.Autowired;
+    import org.springframework.security.core.userdetails.UsernameNotFoundException;
+    import org.springframework.security.crypto.password.PasswordEncoder;
+    import org.springframework.stereotype.Service;
+
+    @Service
+    public class UsersServiceImpl implements UserEntityManager {
+        @Autowired
+        UsersDAO usersDAO;
+
+        @Autowired
+        PasswordEncoder passwordEncoder;
+
+        @Override
+        public UserEntity loadUserByUsername(String username) throws UsernameNotFoundException {
+            UserEntity user = usersDAO.findByUsername(username.toLowerCase());
+            if(user == null) throw new UsernameNotFoundException(username);
+            return user;
+        }
+
+        public UserEntity createUser(UserEntity user) {
+            if(userExists(user.getUsername()))
+                throw new UsernameExistsException();
+            user.setPassword(passwordEncoder.encode(user.getPassword()));
+            usersDAO.save(user);
+            return user;
+        }
+
+        public void updateUser(UserEntity user) {
+        }
+
+        public void deleteUser(String username) {
+        }
+
+        public void changePassword(String oldPassword, String newPassword) {
+        }
+
+        public boolean userExists(String username) {
+            UserEntity user = usersDAO.findByUsername(username);
+            return user != null;
+        }
+    }
+  learner_created: true
+- name: src/account/security/WebSecurityConfig.java
+  visible: true
+  text: |
+    package account.security;
+
+    import org.springframework.beans.factory.annotation.Autowired;
+    import org.springframework.context.annotation.Bean;
+    import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+    import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+    import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+    import org.springframework.security.config.http.SessionCreationPolicy;
+    import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+    import org.springframework.security.crypto.password.PasswordEncoder;
+
+    @EnableWebSecurity
+    public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
+
+        @Autowired
+        RestAuthenticationEntryPoint restAuthEntryPoint;
+
+        @Bean
+        PasswordEncoder passwordEncoder() {
+            return new BCryptPasswordEncoder();
+        }
+
+        @Override
+        protected void configure(HttpSecurity http) throws Exception {
+            http.authorizeRequests() // manage access
+                    .mvcMatchers("/api/auth/signup").anonymous()
+                    .mvcMatchers("/api/empl/payment").authenticated()
+                    .and().csrf().disable().headers().frameOptions().disable() // For Postman, the H2 console
+                    .and().httpBasic().authenticationEntryPoint(restAuthEntryPoint) // Handle auth error
+                    .and().sessionManagement()
+                    .sessionCreationPolicy(SessionCreationPolicy.STATELESS); // No session
+        }
+
+    }
+  learner_created: true
+- name: src/account/models/UserEntity.java
+  visible: true
+  text: |
+    package account.models;
+
+    import account.contracts.UserRegistrationCM;
+    import lombok.Data;
+    import lombok.NoArgsConstructor;
+    import org.springframework.security.core.GrantedAuthority;
+    import org.springframework.security.core.userdetails.UserDetails;
+
+    import javax.persistence.*;
+    import java.util.HashSet;
+    import java.util.Set;
+
+    @Entity
+    @Table(name = "USERS")
+    @Data
+    @NoArgsConstructor
+    public class UserEntity implements UserDetails {
+
+        @Id
+        @GeneratedValue
+        @Column(name="user_id")
+        private long publicId;
+
+        @Column(name="email", unique=true)
+        private String username;
+        private String password;
+        private String firstName;
+        private String lastName;
+
+        @ElementCollection(targetClass = Authority.class, fetch = FetchType.EAGER)
+        @JoinTable(name="AUTHORITIES")
+        private Set<GrantedAuthority> authorities = new HashSet<>();
+
+        public UserEntity(UserRegistrationCM request) {
+            this.firstName = request.getName();
+            this.lastName = request.getLastname();
+            this.username = request.getEmail().toLowerCase();
+            this.password = request.getPassword();
+        }
+
+        public void setUsername(String username) {
+            this.username = username.toLowerCase();
+        }
+
+        //#region Booleans
+
+        @Override
+        public boolean isAccountNonExpired() {
+            return true;
+        }
+
+        @Override
+        public boolean isAccountNonLocked() {
+            return true;
+        }
+
+        @Override
+        public boolean isCredentialsNonExpired() {
+            return true;
+        }
+
+        @Override
+        public boolean isEnabled() {
+            return true;
+        }
+
+        //#endregion
+    }
+  learner_created: true
+- name: src/account/security/RestAuthenticationEntryPoint.java
+  visible: true
+  text: |
+    package account.security;
+
+    import org.springframework.security.core.AuthenticationException;
+    import org.springframework.security.web.AuthenticationEntryPoint;
+    import org.springframework.stereotype.Component;
+
+    import javax.servlet.ServletException;
+    import javax.servlet.http.HttpServletRequest;
+    import javax.servlet.http.HttpServletResponse;
+    import java.io.IOException;
+
+    @Component
+    public class RestAuthenticationEntryPoint implements AuthenticationEntryPoint {
+
+        @Override
+        public void commence(HttpServletRequest request,
+                             HttpServletResponse response,
+                             AuthenticationException authException) throws IOException, ServletException {
+            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, authException.getMessage());
+        }
+    }
+  learner_created: true
+- name: src/account/contracts/UserRegResponseCM.java
+  visible: true
+  text: |
+    package account.contracts;
+
+    import account.models.UserEntity;
+    import lombok.Data;
+    import lombok.NoArgsConstructor;
+
+    @Data
+    @NoArgsConstructor
+    public class UserRegResponseCM {
+
+        private long id;
+        private String name;
+        private String lastname;
+        private String email;
+
+        public UserRegResponseCM(UserEntity user) {
+            this.id = user.getPublicId();
+            this.email = user.getUsername();
+            this.name = user.getFirstName();
+            this.lastname = user.getLastName();
+        }
+    }
+  learner_created: true
+- name: src/account/contracts/UserRegistrationCM.java
+  visible: true
+  text: |
+    package account.contracts;
+
+    import lombok.Data;
+
+    import javax.validation.constraints.NotBlank;
+    import javax.validation.constraints.NotNull;
+
+    @Data
+    public class UserRegistrationCM {
+
+        @NotBlank
+        private String name;
+        @NotBlank
+        private String lastname;
+        @NotNull
+        private String email;
+        @NotBlank
+        private String password;
+
+    }
+  learner_created: true
+- name: src/account/services/UserEntityManager.java
+  visible: true
+  text: |
+    package account.services;
+
+    import account.models.UserEntity;
+    import org.springframework.security.core.userdetails.UserDetailsService;
+
+    public interface UserEntityManager extends UserDetailsService {
+
+        UserEntity createUser(UserEntity user);
+        void updateUser(UserEntity user);
+        void deleteUser(String username);
+        void changePassword(String oldPassword, String newPassword);
+        boolean userExists(String username);
+    }
+  learner_created: true
+- name: src/account/services/UsersDAO.java
+  visible: true
+  text: |
+    package account.services;
+
+    import account.models.UserEntity;
+    import org.springframework.data.repository.CrudRepository;
+    import org.springframework.stereotype.Repository;
+
+    @Repository
+    public interface UsersDAO extends CrudRepository<UserEntity, Long> {
+        UserEntity findByUsername(String username);
+    }
+  learner_created: true
+- name: src/account/validation/UsernameExistsException.java
+  visible: true
+  text: |
+    package account.validation;
+
+    import org.springframework.http.HttpStatus;
+    import org.springframework.web.bind.annotation.ResponseStatus;
+
+    @ResponseStatus(HttpStatus.BAD_REQUEST) // Should be Conflict
+    public class UsernameExistsException extends RuntimeException {
+
+        public UsernameExistsException() {
+            super("User exist!");
+        }
+    }
+  learner_created: true
+- name: src/account/controllers/PayrollAPI.java
+  visible: true
+  text: |
+    package account.controllers;
+
+    import account.contracts.UserRegResponseCM;
+    import account.models.UserEntity;
+    import org.springframework.http.HttpStatus;
+    import org.springframework.http.ResponseEntity;
+    import org.springframework.security.core.annotation.AuthenticationPrincipal;
+    import org.springframework.web.bind.annotation.GetMapping;
+    import org.springframework.web.bind.annotation.RequestMapping;
+    import org.springframework.web.bind.annotation.RestController;
+
+    @RestController
+    @RequestMapping("/api")
+    public class PayrollAPI {
+
+        @GetMapping("/empl/payment")
+        ResponseEntity<UserRegResponseCM> getEmployeePayroll(@AuthenticationPrincipal UserEntity principal) {
+            return new ResponseEntity<UserRegResponseCM>(new UserRegResponseCM(principal), HttpStatus.OK);
+        }
+    }
+  learner_created: true
 feedback_link: https://hyperskill.org/learn/step/16603#comment
 status: Unchecked
 record: -1

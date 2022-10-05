@@ -281,18 +281,18 @@ files:
 - name: src/account/UserMgmtAPI.java
   visible: true
   learner_created: true
+- name: src/account/ContractModelValidator.java
+  visible: true
+  learner_created: true
 - name: src/account/UserRegResponseCM.java
   visible: true
   learner_created: true
-- name: src/account/UserRegRequestCM.java
-  visible: true
-  learner_created: true
-- name: src/account/ContractModelValidator.java
+- name: src/account/UserRegistrationCM.java
   visible: true
   learner_created: true
 feedback_link: https://hyperskill.org/learn/step/16601#comment
 status: Solved
 feedback:
   message: Congratulations!
-  time: Sat, 01 Oct 2022 02:06:13 UTC
+  time: Tue, 04 Oct 2022 15:21:08 UTC
 record: 1

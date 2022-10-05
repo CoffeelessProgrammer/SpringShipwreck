@@ -3,14 +3,14 @@ hyperskill_project:
   ide_files: https://stepik.org/media/attachments/lesson/612593/additional_files.json
   is_template_based: false
   use_ide: true
-update_date: Sat, 01 Oct 2022 02:09:55 UTC
+update_date: Wed, 05 Oct 2022 19:22:01 UTC
 stages:
 - id: 1086
   step: 16601
   is_completed: true
 - id: 1087
   step: 16602
-  is_completed: false
+  is_completed: true
 - id: 1088
   step: 16603
   is_completed: false
@@ -309,6 +309,8 @@ topics:
     theory_id: 7907
   - title: Basic INSERT statement
     theory_id: 9059
+  - title: Intro to MySQL
+    theory_id: 16662
   - title: Basic UPDATE statement
     theory_id: 9067
   - title: JDBC Statements
@@ -317,8 +319,6 @@ topics:
     theory_id: 11014
   - title: JDBC Transactions
     theory_id: 11346
-  - title: Intro to MySQL
-    theory_id: 16662
   - title: Introduction to transactions
     theory_id: 12144
   - title: Understanding Transactions
