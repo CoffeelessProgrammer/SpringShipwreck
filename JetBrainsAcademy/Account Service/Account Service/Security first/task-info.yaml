@@ -518,29 +518,6 @@ files:
       };
     }
   learner_created: false
-- name: src/account/validation/ContractModelValidator.java
-  visible: true
-  text: |
-    package account.validation;
-
-    import account.contracts.UserRegistrationCM;
-
-    public class ContractModelValidator {
-
-        public static boolean validate(UserRegistrationCM cm) {
-            if(cm.getName() == null || cm.getName().isBlank())
-                throw new IllegalArgumentException("name must not be blank");
-            if(cm.getLastname() == null || cm.getLastname().isBlank())
-                throw new IllegalArgumentException("lastname must not be blank");
-            if(cm.getEmail() == null || !cm.getEmail().endsWith("@acme.com"))
-                throw new IllegalArgumentException("invalid email");
-            if(cm.getPassword() == null || cm.getPassword().isBlank())
-                throw new IllegalArgumentException("password must not be blank");
-
-            return true;
-        }
-    }
-  learner_created: true
 - name: src/account/models/Authority.java
   visible: true
   text: |
@@ -908,6 +885,44 @@ files:
         }
     }
   learner_created: true
+- name: src/account/contracts/PasswordChangeCM.java
+  visible: true
+  learner_created: true
+- name: src/account/contracts/PasswordChangeResponseCM.java
+  visible: true
+  learner_created: true
+- name: src/account/validation/ContractValidator.java
+  visible: true
+  text: |
+    package account.validation;
+
+    import account.contracts.UserRegistrationCM;
+
+    public class ContractModelValidator {
+
+        public static boolean validate(UserRegistrationCM cm) {
+            if(cm.getName() == null || cm.getName().isBlank())
+                throw new IllegalArgumentException("name must not be blank");
+            if(cm.getLastname() == null || cm.getLastname().isBlank())
+                throw new IllegalArgumentException("lastname must not be blank");
+            if(cm.getEmail() == null || !cm.getEmail().endsWith("@acme.com"))
+                throw new IllegalArgumentException("invalid email");
+            if(cm.getPassword() == null || cm.getPassword().isBlank())
+                throw new IllegalArgumentException("password must not be blank");
+
+            return true;
+        }
+    }
+  learner_created: true
+- name: src/account/contracts/UserCredential.java
+  visible: true
+  learner_created: true
+- name: src/account/validation/BreachedPasswordException.java
+  visible: true
+  learner_created: true
 feedback_link: https://hyperskill.org/learn/step/16603#comment
-status: Unchecked
+status: Solved
+feedback:
+  message: Congratulations!
+  time: Thu, 06 Oct 2022 20:05:48 UTC
 record: -1

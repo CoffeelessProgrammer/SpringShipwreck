@@ -28,7 +28,8 @@ public class UserEntity implements UserDetails {
     private String lastName;
 
     @ElementCollection(targetClass = Authority.class, fetch = FetchType.EAGER)
-    @JoinTable(name="AUTHORITIES")
+    @JoinTable(name="AUTHORITIES",
+            joinColumns = @JoinColumn(name = "user_id"))
     private Set<GrantedAuthority> authorities = new HashSet<>();
 
     public UserEntity(UserRegistrationCM request) {

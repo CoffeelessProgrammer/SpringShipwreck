@@ -3,9 +3,14 @@ package account.services;
 import account.models.UserEntity;
 import account.validation.UsernameExistsException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 @Service
 public class UsersServiceImpl implements UserEntityManager {
@@ -36,7 +41,17 @@ public class UsersServiceImpl implements UserEntityManager {
     public void deleteUser(String username) {
     }
 
-    public void changePassword(String oldPassword, String newPassword) {
+    public void changePassword(String oldPassword, String newPassword) throws AuthenticationException {
+        Authentication currentUser = SecurityContextHolder.getContext()
+                .getAuthentication();
+
+        UserEntity user = this.loadUserByUsername(currentUser.getName()); // By email
+
+        if(passwordEncoder.matches(newPassword, oldPassword))
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The passwords must be different!");
+
+        user.setPassword(passwordEncoder.encode(newPassword));
+        usersDAO.save(user);
     }
 
     public boolean userExists(String username) {
