@@ -911,16 +911,6 @@ files:
 
     }
   learner_created: true
-- name: src/account/contracts/UserCredential.java
-  visible: true
-  text: |
-    package account.contracts;
-
-    public interface UserCredential {
-
-        String getPassword();
-    }
-  learner_created: true
 - name: src/account/models/UserEntity.java
   visible: true
   text: |
@@ -1110,20 +1100,6 @@ files:
         boolean userExists(String username);
     }
   learner_created: true
-- name: src/account/services/UsersDAO.java
-  visible: true
-  text: |
-    package account.services;
-
-    import account.models.UserEntity;
-    import org.springframework.data.repository.CrudRepository;
-    import org.springframework.stereotype.Repository;
-
-    @Repository
-    public interface UsersDAO extends CrudRepository<UserEntity, Long> {
-        UserEntity findByUsername(String username);
-    }
-  learner_created: true
 - name: src/account/validation/UsernameExistsException.java
   visible: true
   text: |
@@ -1203,6 +1179,54 @@ files:
         }
     }
   learner_created: true
+- name: src/account/contracts/PayrollCM.java
+  visible: true
+  learner_created: true
+- name: src/account/models/PayrollEntity.java
+  visible: true
+  learner_created: true
+- name: src/account/util/DateUtil.java
+  visible: true
+  learner_created: true
+- name: src/account/repositories/UsersDAO.java
+  visible: true
+  text: |
+    package account.services;
+
+    import account.models.UserEntity;
+    import org.springframework.data.repository.CrudRepository;
+    import org.springframework.stereotype.Repository;
+
+    @Repository
+    public interface UsersDAO extends CrudRepository<UserEntity, Long> {
+        UserEntity findByUsername(String username);
+    }
+  learner_created: true
+- name: src/account/repositories/PayrollDAO.java
+  visible: true
+  learner_created: true
+- name: src/account/models/PayrollPK.java
+  visible: true
+  learner_created: true
+- name: src/account/services/PayrollService.java
+  visible: true
+  learner_created: true
+- name: src/account/contracts/PayrollResponseCM.java
+  visible: true
+  learner_created: true
+- name: src/account/validation/UserCredential.java
+  visible: true
+  text: |
+    package account.contracts;
+
+    public interface UserCredential {
+
+        String getPassword();
+    }
+  learner_created: true
 feedback_link: https://hyperskill.org/learn/step/16604#comment
-status: Unchecked
+status: Solved
+feedback:
+  message: Congratulations!
+  time: Mon, 10 Oct 2022 03:33:46 UTC
 record: -1

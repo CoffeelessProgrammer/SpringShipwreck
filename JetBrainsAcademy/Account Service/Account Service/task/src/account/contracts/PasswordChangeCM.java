@@ -1,5 +1,6 @@
 package account.contracts;
 
+import account.validation.UserCredential;
 import com.fasterxml.jackson.annotation.JsonAlias;
 import lombok.Data;
 

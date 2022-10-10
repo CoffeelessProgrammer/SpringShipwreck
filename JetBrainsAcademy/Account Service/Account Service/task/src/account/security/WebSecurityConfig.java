@@ -8,7 +8,6 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.provisioning.JdbcUserDetailsManager;
 
 @EnableWebSecurity
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
@@ -25,8 +24,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         http.authorizeRequests() // manage access
                 .mvcMatchers("/api/auth/signup").anonymous()
+                .mvcMatchers("/api/acct/payments").anonymous()
                 .mvcMatchers("/api/auth/changepass").authenticated()
-                .mvcMatchers("/api/empl/**").authenticated()
+                .mvcMatchers("/api/empl/payment").authenticated()
                 .and().csrf().disable().headers().frameOptions().disable() // For Postman, the H2 console
                 .and().httpBasic().authenticationEntryPoint(restAuthEntryPoint) // Handle auth error
                 .and().sessionManagement()

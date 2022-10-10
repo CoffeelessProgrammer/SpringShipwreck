@@ -1,6 +1,7 @@
 package account.services;
 
 import account.models.UserEntity;
+import account.repositories.UsersDAO;
 import account.validation.UsernameExistsException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;

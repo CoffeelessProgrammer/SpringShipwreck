@@ -1,4 +1,4 @@
-package account.contracts;
+package account.validation;
 
 public interface UserCredential {
 

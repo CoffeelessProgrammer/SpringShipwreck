@@ -1,5 +1,6 @@
 package account.contracts;
 
+import account.validation.UserCredential;
 import lombok.Data;
 
 import javax.validation.constraints.*;

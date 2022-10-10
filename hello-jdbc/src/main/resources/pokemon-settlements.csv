@@ -1,31 +1,31 @@
-city_id,city_name,region,slogan
-0,Pallet Town,Kanto,A Pure White Beginning
-1,Viridian City,Kanto,The City of Evergreen
-2,Pewter City,Kanto,Between Rugged Mountains
-3,Cerulean City,Kanto,The Floral Lagoon City
-4,Vermilion City,Kanto,The Port of Exquisite Sunsets
-5,Lavender Town,Kanto,The Noble Town
-6,Celadon City,Kanto,City of the Rainbow's Colors
-7,Fuchsia City,Kanto,Happening and Passing City
-8,Saffron City,Kanto,Shining Big City
-9,Cinnabar Island,Kanto,The Ravaged Town of the Past
-10,Indigo Plateau,Kanto,The ultimate Goal of Trainers!
-11,One Island,Sevii Islands,Friends Gather at Knot Island
-12,Two Island,Sevii Islands,Boon Island for Two
-13,Three Island,Sevii Islands,Kin Island of Family Bonding
-14,Four Island,Sevii Islands,"The Warm, Blue, Floe Island"
-15,Five Island,Sevii Islands,Chrono Island: Where Time Goes
-16,Six Island,Sevii Islands,Fortune Island of Aged Wisdom
-17,Seven Island,Sevii Islands,Quest Island of Infinity
-18,New Bark Town,Johto,Winds of a New Beginning
-19,Cherrygrove City,Johto,The City of Fragrant Flowers
-20,Violet City,Johto,The City of Nostalgic Scents
-21,Azalea Town,Johto,Living Happily with Pokémon
-22,Goldenrod City,Johto,A Happening Big City
-23,Ecruteak City,Johto,A Historical City
-24,Olivine City,Johto,The Port with Sea Breezes
-25,Frontier Access,Johto,NULL
-26,Cianwood City,Johto,A Port of Crashing Waves
-27,Safari Zone Gate,Johto,NULL
-28,Mahogany Town,Johto,Home of the Ninja
-29,Blackthorn City,Johto,A Quiet Mountain Retreat
+city_name,region,slogan
+Pallet Town,Kanto,A Pure White Beginning
+Viridian City,Kanto,The City of Evergreen
+Pewter City,Kanto,Between Rugged Mountains
+Cerulean City,Kanto,The Floral Lagoon City
+Vermilion City,Kanto,The Port of Exquisite Sunsets
+Lavender Town,Kanto,The Noble Town
+Celadon City,Kanto,City of the Rainbow's Colors
+Fuchsia City,Kanto,Happening and Passing City
+Saffron City,Kanto,Shining Big City
+Cinnabar Island,Kanto,The Ravaged Town of the Past
+Indigo Plateau,Kanto,The ultimate Goal of Trainers!
+One Island,Sevii Islands,Friends Gather at Knot Island
+Two Island,Sevii Islands,Boon Island for Two
+Three Island,Sevii Islands,Kin Island of Family Bonding
+Four Island,Sevii Islands,"The Warm, Blue, Floe Island"
+Five Island,Sevii Islands,Chrono Island: Where Time Goes
+Six Island,Sevii Islands,Fortune Island of Aged Wisdom
+Seven Island,Sevii Islands,Quest Island of Infinity
+New Bark Town,Johto,Winds of a New Beginning
+Cherrygrove City,Johto,The City of Fragrant Flowers
+Violet City,Johto,The City of Nostalgic Scents
+Azalea Town,Johto,Living Happily with Pokémon
+Goldenrod City,Johto,A Happening Big City
+Ecruteak City,Johto,A Historical City
+Olivine City,Johto,The Port with Sea Breezes
+Frontier Access,Johto,NULL
+Cianwood City,Johto,A Port of Crashing Waves
+Safari Zone Gate,Johto,NULL
+Mahogany Town,Johto,Home of the Ninja
+Blackthorn City,Johto,A Quiet Mountain Retreat

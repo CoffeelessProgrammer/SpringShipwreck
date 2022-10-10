@@ -39,6 +39,19 @@ public class UserEntity implements UserDetails {
         this.password = request.getPassword();
     }
 
+    public UserEntity(String email) {
+        this.username = email;
+    }
+
+    public UserEntity(long userId) {
+        this.publicId = userId;
+    }
+
+    public UserEntity(long userId, String email) {
+        this.publicId = userId;
+        this.username = email;
+    }
+
     public void setUsername(String username) {
         this.username = username.toLowerCase();
     }
