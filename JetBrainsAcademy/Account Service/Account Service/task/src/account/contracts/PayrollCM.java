@@ -4,22 +4,20 @@ import com.fasterxml.jackson.annotation.JsonAlias;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.validation.constraints.Email;
-import javax.validation.constraints.Min;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Pattern;
+import javax.validation.constraints.*;
 
 @Data
 @NoArgsConstructor
 public class PayrollCM {
-    @NotNull
+    @NotBlank
     @Email(regexp=".*@acme\\.com", flags={Pattern.Flag.CASE_INSENSITIVE})
     @JsonAlias("employee")
     private String employeeEmail;
-    @NotNull
+    @NotBlank
     @Pattern(regexp = "[0-1]\\d-20\\d{2}")
     private String period;
     @NotNull
+    @Min(0)
     private long salary;
 
     public void emailToLowercase() {

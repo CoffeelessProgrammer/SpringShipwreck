@@ -15,7 +15,6 @@ import org.springframework.web.server.ResponseStatusException;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Pattern;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;

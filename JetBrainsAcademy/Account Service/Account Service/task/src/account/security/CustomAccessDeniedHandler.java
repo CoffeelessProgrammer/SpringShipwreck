@@ -1,5 +1,6 @@
 package account.security;
 
+import account.contracts.ErrorPayloadCM;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.web.access.AccessDeniedHandler;
@@ -17,25 +18,26 @@ import java.util.Map;
 @Component
 public class CustomAccessDeniedHandler implements AccessDeniedHandler {
 
-    private static final SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
-
     @Override
     public void handle(HttpServletRequest request,
-                       HttpServletResponse response, AccessDeniedException accessDeniedException) throws IOException, ServletException {
+                       HttpServletResponse response, AccessDeniedException accessDeniedException) throws IOException {
         response.setContentType("application/json;charset=UTF-8");
         response.setStatus(403);
 
-        Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+//        Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+//
+//        Map<String, Object> payload = new LinkedHashMap<>();
+//        payload.put("timestamp", sdf.format(timestamp));
+//        payload.put("status", 403);
+//        payload.put("error", "Forbidden");
+//        payload.put("message", "Access Denied!");
+//        payload.put("path", request.getServletPath());
+//
+//        String json = new ObjectMapper().writeValueAsString(payload);
 
-        Map<String, Object> payload = new LinkedHashMap<>();
-        payload.put("timestamp", sdf.format(timestamp));
-        payload.put("status", 403);
-        payload.put("error", "Forbidden");
-        payload.put("message", "Access Denied!");
-        payload.put("path", request.getServletPath());
+        ErrorPayloadCM payload = new ErrorPayloadCM(403, request.getServletPath());
+        payload.setMessage("Access denied!");
 
-        String json = new ObjectMapper().writeValueAsString(payload);
-
-        response.getWriter().write(json);
+        response.getWriter().write(payload.toString());
     }
 }

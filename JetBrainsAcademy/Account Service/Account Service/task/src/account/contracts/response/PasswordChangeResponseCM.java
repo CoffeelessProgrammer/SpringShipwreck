@@ -1,4 +1,4 @@
-package account.contracts;
+package account.contracts.response;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;

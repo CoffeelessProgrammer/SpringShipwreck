@@ -1,31 +1,26 @@
 package account.controllers;
 
-import org.springframework.http.HttpHeaders;
+import account.contracts.ErrorPayloadCM;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
-import org.springframework.web.context.request.WebRequest;
-import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 
-import java.time.LocalDateTime;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import javax.servlet.http.HttpServletRequest;
+import javax.validation.ConstraintViolationException;
 
 @ControllerAdvice
-public class ExceptionInterceptor extends ResponseEntityExceptionHandler {
+public class ExceptionInterceptor {
 
-    @Override
-    protected ResponseEntity<Object> handleMethodArgumentNotValid(
-            MethodArgumentNotValidException ex,
-            HttpHeaders headers,
-            HttpStatus status,
-            WebRequest request) {
-
-        Map<String, Object> body = new LinkedHashMap<>();
-        body.put("status", status.value());
-        body.put("timestamp", LocalDateTime.now());
-        body.put("exception", ex.getClass());
-        return new ResponseEntity<>(body, headers, HttpStatus.BAD_REQUEST);
+    @ExceptionHandler({ConstraintViolationException.class})
+    ResponseEntity<ErrorPayloadCM> handleConstraintViolationException(ConstraintViolationException ex,
+                                                                     HttpServletRequest request) {
+        /* Note: Throwing an exception seems to negate the exception handler,
+         * and the original error is thrown instead. Must return a proper response.
+         */
+        // throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid request");
+        ErrorPayloadCM response = new ErrorPayloadCM(400, request.getServletPath());
+        response.setMessage(ex.getMessage());
+        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
 }

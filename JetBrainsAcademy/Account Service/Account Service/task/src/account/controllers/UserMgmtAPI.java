@@ -1,6 +1,7 @@
 package account.controllers;
 
 import account.contracts.*;
+import account.contracts.response.PasswordChangeResponseCM;
 import account.models.UserEntity;
 import account.services.UserEntityManager;
 import account.validation.ContractValidator;

@@ -1,4 +1,4 @@
-package account.contracts;
+package account.contracts.response;
 
 import account.models.PayrollEntity;
 import account.models.UserEntity;

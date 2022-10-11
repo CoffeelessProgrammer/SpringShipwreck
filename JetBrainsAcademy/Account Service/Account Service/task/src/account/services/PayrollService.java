@@ -1,7 +1,7 @@
 package account.services;
 
 import account.contracts.PayrollCM;
-import account.contracts.PayrollResponseCM;
+import account.contracts.response.PayrollResponseCM;
 import account.models.PayrollEntity;
 import account.models.PayrollPK;
 import account.models.UserEntity;

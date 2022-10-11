@@ -1224,32 +1224,6 @@ files:
         }
     }
   learner_created: true
-- name: src/account/contracts/UserRegResponseCM.java
-  visible: true
-  text: |
-    package account.contracts;
-
-    import account.models.UserEntity;
-    import lombok.Data;
-    import lombok.NoArgsConstructor;
-
-    @Data
-    @NoArgsConstructor
-    public class UserRegResponseCM {
-
-        private long id;
-        private String name;
-        private String lastname;
-        private String email;
-
-        public UserRegResponseCM(UserEntity user) {
-            this.id = user.getPublicId();
-            this.email = user.getUsername();
-            this.name = user.getFirstName();
-            this.lastname = user.getLastName();
-        }
-    }
-  learner_created: true
 - name: src/account/contracts/UserRegistrationCM.java
   visible: true
   text: |
@@ -1414,43 +1388,6 @@ files:
         }
     }
   learner_created: true
-- name: src/account/contracts/PayrollResponseCM.java
-  visible: true
-  text: |
-    package account.contracts;
-
-    import account.models.PayrollEntity;
-    import account.models.UserEntity;
-    import com.fasterxml.jackson.annotation.JsonProperty;
-    import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-    import lombok.Data;
-
-    import java.time.LocalDate;
-
-    @Data
-    @JsonPropertyOrder({"name", "lastname", "period", "salary"})
-    public class PayrollResponseCM {
-        @JsonProperty("name")
-        private String firstName;
-        @JsonProperty("lastname")
-        private String lastName;
-        private String period;
-        private String salary;
-
-        public PayrollResponseCM(PayrollEntity payrollEntity, UserEntity employee) {
-            LocalDate period = payrollEntity.getPayrollId().getPeriod();
-            String month = period.getMonth().name();
-            this.period = month.charAt(0) + month.substring(1).toLowerCase() + "-" + period.getYear();
-            this.salary = salaryToString(payrollEntity.getSalary());
-            this.firstName = employee.getFirstName();
-            this.lastName = employee.getLastName();
-        }
-
-        private static String salaryToString(long salary) {
-            return salary/100 + " dollar(s) " + salary%100 + " cent(s)";
-        }
-    }
-  learner_created: true
 - name: src/account/util/DateUtil.java
   visible: true
   text: |
@@ -1489,41 +1426,6 @@ files:
 
     public enum AuthorityOperation {
         GRANT, REMOVE
-    }
-  learner_created: true
-- name: src/account/controllers/ExceptionInterceptor.java
-  visible: true
-  text: |
-    package account.controllers;
-
-    import org.springframework.http.HttpHeaders;
-    import org.springframework.http.HttpStatus;
-    import org.springframework.http.ResponseEntity;
-    import org.springframework.web.bind.MethodArgumentNotValidException;
-    import org.springframework.web.bind.annotation.ControllerAdvice;
-    import org.springframework.web.context.request.WebRequest;
-    import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
-
-    import java.time.LocalDateTime;
-    import java.util.LinkedHashMap;
-    import java.util.Map;
-
-    @ControllerAdvice
-    public class ExceptionInterceptor extends ResponseEntityExceptionHandler {
-
-        @Override
-        protected ResponseEntity<Object> handleMethodArgumentNotValid(
-                MethodArgumentNotValidException ex,
-                HttpHeaders headers,
-                HttpStatus status,
-                WebRequest request) {
-
-            Map<String, Object> body = new LinkedHashMap<>();
-            body.put("status", status.value());
-            body.put("timestamp", LocalDateTime.now());
-            body.put("exception", ex.getClass());
-            return new ResponseEntity<>(body, headers, HttpStatus.BAD_REQUEST);
-        }
     }
   learner_created: true
 - name: src/account/controllers/AdminAPI.java
@@ -1746,29 +1648,6 @@ files:
             PayrollEntity payrollEntity = payrollOptional.orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Payroll entry not found"));
             payrollEntity.setSalary(payroll.getSalary());
             payrollDao.save(payrollEntity);
-        }
-    }
-  learner_created: true
-- name: src/account/contracts/PasswordChangeResponseCM.java
-  visible: true
-  text: |
-    package account.contracts;
-
-    import lombok.Data;
-    import lombok.NoArgsConstructor;
-
-    @Data
-    @NoArgsConstructor
-    public class PasswordChangeResponseCM {
-
-        private static final String success = "The password has been updated successfully";
-
-        private String email;
-        private String status;
-
-        public PasswordChangeResponseCM(String email) {
-            this.email = email;
-            this.status = success;
         }
     }
   learner_created: true
@@ -2016,6 +1895,98 @@ files:
 
         String getPassword();
     }
+  learner_created: true
+- name: src/account/contracts/response/PayrollResponseCM.java
+  visible: true
+  text: |
+    package account.contracts;
+
+    import account.models.PayrollEntity;
+    import account.models.UserEntity;
+    import com.fasterxml.jackson.annotation.JsonProperty;
+    import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+    import lombok.Data;
+
+    import java.time.LocalDate;
+
+    @Data
+    @JsonPropertyOrder({"name", "lastname", "period", "salary"})
+    public class PayrollResponseCM {
+        @JsonProperty("name")
+        private String firstName;
+        @JsonProperty("lastname")
+        private String lastName;
+        private String period;
+        private String salary;
+
+        public PayrollResponseCM(PayrollEntity payrollEntity, UserEntity employee) {
+            LocalDate period = payrollEntity.getPayrollId().getPeriod();
+            String month = period.getMonth().name();
+            this.period = month.charAt(0) + month.substring(1).toLowerCase() + "-" + period.getYear();
+            this.salary = salaryToString(payrollEntity.getSalary());
+            this.firstName = employee.getFirstName();
+            this.lastName = employee.getLastName();
+        }
+
+        private static String salaryToString(long salary) {
+            return salary/100 + " dollar(s) " + salary%100 + " cent(s)";
+        }
+    }
+  learner_created: true
+- name: src/account/contracts/response/PasswordChangeResponseCM.java
+  visible: true
+  text: |
+    package account.contracts;
+
+    import lombok.Data;
+    import lombok.NoArgsConstructor;
+
+    @Data
+    @NoArgsConstructor
+    public class PasswordChangeResponseCM {
+
+        private static final String success = "The password has been updated successfully";
+
+        private String email;
+        private String status;
+
+        public PasswordChangeResponseCM(String email) {
+            this.email = email;
+            this.status = success;
+        }
+    }
+  learner_created: true
+- name: src/account/contracts/response/UserRegResponseCM.java
+  visible: true
+  text: |
+    package account.contracts;
+
+    import account.models.UserEntity;
+    import lombok.Data;
+    import lombok.NoArgsConstructor;
+
+    @Data
+    @NoArgsConstructor
+    public class UserRegResponseCM {
+
+        private long id;
+        private String name;
+        private String lastname;
+        private String email;
+
+        public UserRegResponseCM(UserEntity user) {
+            this.id = user.getPublicId();
+            this.email = user.getUsername();
+            this.name = user.getFirstName();
+            this.lastname = user.getLastName();
+        }
+    }
+  learner_created: true
+- name: src/account/contracts/ErrorPayloadCM.java
+  visible: true
+  learner_created: true
+- name: src/account/controllers/ExceptionInterceptor.java
+  visible: true
   learner_created: true
 feedback_link: https://hyperskill.org/learn/step/16606#comment
 status: Unchecked
