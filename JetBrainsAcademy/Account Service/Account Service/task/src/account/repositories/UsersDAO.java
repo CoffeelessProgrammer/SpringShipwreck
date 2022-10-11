@@ -10,5 +10,7 @@ import java.util.List;
 @Repository
 public interface UsersDAO extends CrudRepository<UserEntity, Long> {
     UserEntity findByUsername(String username);
-    List<UserEntity> findByUsernameIn(Collection<String> usernames);
+    List<UserEntity> findAllByOrderByPublicIdAsc();
+    boolean existsByUsername(String email);
+    void deleteByUsername(String email);
 }

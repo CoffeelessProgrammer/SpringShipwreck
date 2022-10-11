@@ -29,8 +29,13 @@ public class UsersServiceImpl implements UserEntityManager {
     }
 
     public UserEntity createUser(UserEntity user) {
+        if(usersDAO.count() == 0)
+            user.addRole("ADMINISTRATOR");
+        else user.addRole("USER");
+
         if(userExists(user.getUsername()))
             throw new UsernameExistsException();
+
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         usersDAO.save(user);
         return user;

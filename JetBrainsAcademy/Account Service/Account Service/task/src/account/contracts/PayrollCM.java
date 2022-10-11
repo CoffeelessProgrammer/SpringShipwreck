@@ -19,7 +19,6 @@ public class PayrollCM {
     @NotNull
     @Pattern(regexp = "[0-1]\\d-20\\d{2}")
     private String period;
-    @Min(0)
     @NotNull
     private long salary;
 

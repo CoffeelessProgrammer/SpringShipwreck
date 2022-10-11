@@ -820,6 +820,1203 @@ files:
 
     }
   learner_created: false
+- name: src/account/contracts/UserInfoCM.java
+  visible: true
+  text: |
+    package account.contracts;
+
+    import account.models.Authority;
+    import account.models.UserEntity;
+    import lombok.Data;
+    import org.springframework.security.core.GrantedAuthority;
+
+    import java.util.ArrayList;
+    import java.util.Collections;
+    import java.util.List;
+    import java.util.Set;
+
+    @Data
+    public class UserInfoCM {
+        private long id;
+        private String name;
+        private String lastname;
+        private String email;
+        private List<String> roles;
+
+        public UserInfoCM(UserEntity userEntity) {
+            this.id = userEntity.getPublicId();
+            this.name = userEntity.getFirstName();
+            this.lastname = userEntity.getLastName();
+            this.email = userEntity.getUsername();
+            this.roles = new ArrayList<>();
+
+            for(GrantedAuthority authority : userEntity.getAuthorities())
+                this.roles.add(authority.getAuthority());
+
+            Collections.sort(roles);
+        }
+    }
+  learner_created: true
+- name: src/account/repositories/UsersDAO.java
+  visible: true
+  text: |
+    package account.repositories;
+
+    import account.models.UserEntity;
+    import org.springframework.data.repository.CrudRepository;
+    import org.springframework.stereotype.Repository;
+
+    import java.util.Collection;
+    import java.util.List;
+
+    @Repository
+    public interface UsersDAO extends CrudRepository<UserEntity, Long> {
+        UserEntity findByUsername(String username);
+        List<UserEntity> findAllByOrderByPublicIdAsc();
+        boolean existsByUsername(String email);
+        void deleteByUsername(String email);
+    }
+  learner_created: true
+- name: src/account/validation/ContractValidator.java
+  visible: true
+  text: |
+    package account.validation;
+
+    import account.contracts.PayrollCM;
+    import org.springframework.http.HttpStatus;
+    import org.springframework.web.server.ResponseStatusException;
+
+    import java.util.regex.Pattern;
+
+    public class ContractValidator {
+
+        private static final Pattern pattern = Pattern.compile(".*password.*", Pattern.CASE_INSENSITIVE);
+
+        public static boolean validatePassword(UserCredential credential) {
+            if(pattern.matcher(credential.getPassword()).matches())
+                throw new BreachedPasswordException();
+
+            return true;
+        }
+
+        public static boolean validate(PayrollCM payrollCM) {
+            validatePeriod(payrollCM.getPeriod());
+            if(payrollCM.getSalary() < 0)
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Negative salary");
+
+            return true;
+        }
+
+        public static boolean validatePeriod(String period) {
+            if(period != null && period.length() == 0) return true;
+
+            final int month = Integer.parseInt(period.split("-")[0]);
+            if(month > 12 || month < 1)
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid month");
+
+            return true;
+        }
+    }
+  learner_created: true
+- name: src/account/security/UserRoles.java
+  visible: true
+  text: |
+    package account.security;
+
+    public enum UserRoles {
+        USER, ACCOUNTANT, ADMINISTRATOR
+    }
+  learner_created: true
+- name: src/account/models/Authority.java
+  visible: true
+  text: |
+    package account.models;
+
+    import lombok.AllArgsConstructor;
+    import lombok.Data;
+    import lombok.NoArgsConstructor;
+    import org.springframework.security.core.GrantedAuthority;
+
+    import javax.persistence.Embeddable;
+
+    @Embeddable
+    @Data
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public class Authority implements GrantedAuthority {
+
+        private String authority;
+
+    //    public boolean equals(String str) {
+    //        return str.equals(this.authority);
+    //    }
+    }
+  learner_created: true
+- name: src/account/controllers/UserMgmtAPI.java
+  visible: true
+  text: |-
+    package account.controllers;
+
+    import account.contracts.*;
+    import account.models.UserEntity;
+    import account.services.UserEntityManager;
+    import account.validation.ContractValidator;
+    import org.springframework.beans.factory.annotation.Autowired;
+    import org.springframework.http.HttpStatus;
+    import org.springframework.http.ResponseEntity;
+    import org.springframework.security.core.annotation.AuthenticationPrincipal;
+    import org.springframework.validation.Errors;
+    import org.springframework.web.bind.annotation.PostMapping;
+    import org.springframework.web.bind.annotation.RequestBody;
+    import org.springframework.web.bind.annotation.RequestMapping;
+    import org.springframework.web.bind.annotation.RestController;
+    import org.springframework.web.server.ResponseStatusException;
+
+    import javax.validation.Valid;
+
+    @RestController
+    @RequestMapping("/api/auth")
+    public class UserMgmtAPI {
+
+        @Autowired
+        UserEntityManager usersService;
+
+        @PostMapping("/signup")
+        ResponseEntity<UserInfoCM> userRegistration(@RequestBody @Valid UserRegistrationCM request, Errors errors) {
+            if(errors.hasFieldErrors()) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, errors.getFieldError().getDefaultMessage());
+            }
+            ContractValidator.validatePassword(request);
+            UserEntity newUser = usersService.createUser(new UserEntity(request));
+            return new ResponseEntity<>(new UserInfoCM(newUser), HttpStatus.OK);
+        }
+
+        @PostMapping("/changepass")
+        ResponseEntity<PasswordChangeResponseCM> changePassword(@AuthenticationPrincipal UserEntity user,
+                                                                @RequestBody @Valid PasswordChangeCM request,
+                                                                Errors errors) {
+            if(errors.hasFieldErrors()) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, errors.getFieldError().getDefaultMessage());
+            }
+            PasswordChangeResponseCM response = new PasswordChangeResponseCM(user.getUsername());
+            ContractValidator.validatePassword(request);
+            usersService.changePassword(user.getPassword(), request.getNewPassword());
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        }
+
+    }
+  learner_created: true
+- name: src/account/services/UsersServiceImpl.java
+  visible: true
+  text: |
+    package account.services;
+
+    import account.models.UserEntity;
+    import account.repositories.UsersDAO;
+    import account.validation.UsernameExistsException;
+    import org.springframework.beans.factory.annotation.Autowired;
+    import org.springframework.http.HttpStatus;
+    import org.springframework.security.core.Authentication;
+    import org.springframework.security.core.AuthenticationException;
+    import org.springframework.security.core.context.SecurityContextHolder;
+    import org.springframework.security.core.userdetails.UsernameNotFoundException;
+    import org.springframework.security.crypto.password.PasswordEncoder;
+    import org.springframework.stereotype.Service;
+    import org.springframework.web.server.ResponseStatusException;
+
+    @Service
+    public class UsersServiceImpl implements UserEntityManager {
+        @Autowired
+        UsersDAO usersDAO;
+
+        @Autowired
+        PasswordEncoder passwordEncoder;
+
+        @Override
+        public UserEntity loadUserByUsername(String username) throws UsernameNotFoundException {
+            UserEntity user = usersDAO.findByUsername(username.toLowerCase());
+            if(user == null) throw new UsernameNotFoundException(username);
+            return user;
+        }
+
+        public UserEntity createUser(UserEntity user) {
+            if(usersDAO.count() == 0)
+                user.addRole("ADMINISTRATOR");
+            else user.addRole("USER");
+
+            if(userExists(user.getUsername()))
+                throw new UsernameExistsException();
+
+            user.setPassword(passwordEncoder.encode(user.getPassword()));
+            usersDAO.save(user);
+            return user;
+        }
+
+        public void updateUser(UserEntity user) {
+        }
+
+        public void deleteUser(String username) {
+        }
+
+        public void changePassword(String oldPassword, String newPassword) throws AuthenticationException {
+            Authentication currentUser = SecurityContextHolder.getContext()
+                    .getAuthentication();
+
+            UserEntity user = this.loadUserByUsername(currentUser.getName()); // By email
+
+            if(passwordEncoder.matches(newPassword, oldPassword))
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The passwords must be different!");
+
+            user.setPassword(passwordEncoder.encode(newPassword));
+            usersDAO.save(user);
+        }
+
+        public boolean userExists(String username) {
+            UserEntity user = usersDAO.findByUsername(username);
+            return user != null;
+        }
+    }
+  learner_created: true
+- name: src/account/models/UserEntity.java
+  visible: true
+  text: |
+    package account.models;
+
+    import account.contracts.UserRegistrationCM;
+    import com.fasterxml.jackson.annotation.JsonIgnore;
+    import lombok.Data;
+    import lombok.NoArgsConstructor;
+    import org.springframework.http.HttpStatus;
+    import org.springframework.security.core.GrantedAuthority;
+    import org.springframework.security.core.authority.SimpleGrantedAuthority;
+    import org.springframework.security.core.userdetails.UserDetails;
+    import org.springframework.web.server.ResponseStatusException;
+
+    import javax.persistence.*;
+    import java.util.HashSet;
+    import java.util.Set;
+
+    @Entity
+    @Table(name = "USERS")
+    @Data
+    @NoArgsConstructor
+    public class UserEntity implements UserDetails {
+
+        @Id
+        @GeneratedValue
+        @Column(name="user_id")
+        private long publicId;
+
+        @Column(name="email", unique=true)
+        private String username;
+        @JsonIgnore
+        private String password;
+        private String firstName;
+        private String lastName;
+
+        @ElementCollection(targetClass = Authority.class, fetch = FetchType.EAGER)
+        @JoinTable(name="AUTHORITIES",
+                joinColumns = @JoinColumn(name = "user_id"))
+        private Set<GrantedAuthority> authorities = new HashSet<>();
+
+        public UserEntity(UserRegistrationCM request) {
+            this.firstName = request.getName();
+            this.lastName = request.getLastname();
+            this.username = request.getEmail().toLowerCase();
+            this.password = request.getPassword();
+        }
+
+        public UserEntity(String email) {
+            this.username = email;
+        }
+
+        public UserEntity(long userId) {
+            this.publicId = userId;
+        }
+
+        public UserEntity(long userId, String email) {
+            this.publicId = userId;
+            this.username = email;
+        }
+
+        public void setUsername(String username) {
+            this.username = username.toLowerCase();
+        }
+
+        public boolean addRole(String role) {
+            if ((role.equals("ACCOUNTANT") || role.equals("USER")) && this.hasRole("ADMINISTRATOR"))
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The user cannot combine administrative and business roles!");
+            if (role.equals("ADMINISTRATOR") && (this.hasRole("USER") || this.hasRole("ACCOUNTANT")))
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The user cannot combine administrative and business roles!");
+
+            return this.authorities.add(new Authority("ROLE_" + role));
+        }
+
+        public boolean hasRole(String role) {
+            return this.authorities.contains(new Authority("ROLE_" + role));
+        }
+
+        public boolean removeRole(String role) {
+            if (this.authorities.size() < 2)
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The user must have at least one role!");
+
+            return this.authorities.remove(new Authority("ROLE_" + role));
+        }
+
+        //#region Booleans
+
+        @Override
+        public boolean isAccountNonExpired() {
+            return true;
+        }
+
+        @Override
+        public boolean isAccountNonLocked() {
+            return true;
+        }
+
+        @Override
+        public boolean isCredentialsNonExpired() {
+            return true;
+        }
+
+        @Override
+        public boolean isEnabled() {
+            return true;
+        }
+
+        //#endregion
+    }
+  learner_created: true
+- name: src/account/contracts/PayrollCM.java
+  visible: true
+  text: |
+    package account.contracts;
+
+    import com.fasterxml.jackson.annotation.JsonAlias;
+    import lombok.Data;
+    import lombok.NoArgsConstructor;
+
+    import javax.validation.constraints.Email;
+    import javax.validation.constraints.Min;
+    import javax.validation.constraints.NotNull;
+    import javax.validation.constraints.Pattern;
+
+    @Data
+    @NoArgsConstructor
+    public class PayrollCM {
+        @NotNull
+        @Email(regexp=".*@acme\\.com", flags={Pattern.Flag.CASE_INSENSITIVE})
+        @JsonAlias("employee")
+        private String employeeEmail;
+        @NotNull
+        @Pattern(regexp = "[0-1]\\d-20\\d{2}")
+        private String period;
+        @NotNull
+        private long salary;
+
+        public void emailToLowercase() {
+            this.employeeEmail = employeeEmail.toLowerCase();
+        }
+
+        public void setEmployeeEmail(String email) {
+            this.employeeEmail = email.toLowerCase();
+        }
+    }
+  learner_created: true
+- name: src/account/contracts/UserRegResponseCM.java
+  visible: true
+  text: |
+    package account.contracts;
+
+    import account.models.UserEntity;
+    import lombok.Data;
+    import lombok.NoArgsConstructor;
+
+    @Data
+    @NoArgsConstructor
+    public class UserRegResponseCM {
+
+        private long id;
+        private String name;
+        private String lastname;
+        private String email;
+
+        public UserRegResponseCM(UserEntity user) {
+            this.id = user.getPublicId();
+            this.email = user.getUsername();
+            this.name = user.getFirstName();
+            this.lastname = user.getLastName();
+        }
+    }
+  learner_created: true
+- name: src/account/contracts/UserRegistrationCM.java
+  visible: true
+  text: |
+    package account.contracts;
+
+    import account.validation.UserCredential;
+    import lombok.Data;
+
+    import javax.validation.constraints.*;
+
+    @Data
+    public class UserRegistrationCM implements UserCredential {
+
+        @NotBlank
+        private String name;
+        @NotBlank
+        private String lastname;
+        @NotBlank
+        @Email(regexp=".*@acme\\.com", flags={Pattern.Flag.CASE_INSENSITIVE})
+        private String email;
+        @NotBlank
+        @Size(min=12, message="The password length must be at least 12 chars!")
+        private String password;
+
+    }
+  learner_created: true
+- name: src/account/contracts/ModifyRoleCM.java
+  visible: true
+  text: |
+    package account.contracts;
+
+    import account.security.AuthorityOperation;
+    import com.fasterxml.jackson.annotation.JsonProperty;
+    import lombok.Data;
+    import lombok.NoArgsConstructor;
+
+    import javax.validation.constraints.Email;
+    import javax.validation.constraints.NotBlank;
+    import javax.validation.constraints.NotNull;
+    import javax.validation.constraints.Pattern;
+
+    @Data
+    @NoArgsConstructor
+    public class ModifyRoleCM {
+        @JsonProperty("user")
+        @NotBlank
+        @Email(regexp=".*@acme\\.com", flags={Pattern.Flag.CASE_INSENSITIVE})
+        private String email;
+
+        @NotBlank
+        private String role;
+
+        @NotNull
+        private AuthorityOperation operation;
+
+        public void setRole(String role) {
+            this.role = role.toUpperCase();
+        }
+
+        public void setEmail(String email) {
+            this.email = email.toLowerCase();
+        }
+
+    }
+  learner_created: true
+- name: src/account/services/UserEntityManager.java
+  visible: true
+  text: |
+    package account.services;
+
+    import account.models.UserEntity;
+    import org.springframework.security.core.userdetails.UserDetailsService;
+
+    public interface UserEntityManager extends UserDetailsService {
+
+        UserEntity createUser(UserEntity user);
+        void updateUser(UserEntity user);
+        void deleteUser(String username);
+        void changePassword(String oldPassword, String newPassword);
+        boolean userExists(String username);
+    }
+  learner_created: true
+- name: src/account/validation/UsernameExistsException.java
+  visible: true
+  text: |
+    package account.validation;
+
+    import org.springframework.http.HttpStatus;
+    import org.springframework.web.bind.annotation.ResponseStatus;
+
+    @ResponseStatus(HttpStatus.BAD_REQUEST) // Should be Conflict
+    public class UsernameExistsException extends RuntimeException {
+
+        public UsernameExistsException() {
+            super("User exist!");
+        }
+    }
+  learner_created: true
+- name: src/account/contracts/PasswordChangeCM.java
+  visible: true
+  text: |
+    package account.contracts;
+
+    import account.validation.UserCredential;
+    import com.fasterxml.jackson.annotation.JsonAlias;
+    import lombok.Data;
+
+    import javax.validation.constraints.Size;
+
+    @Data
+    public class PasswordChangeCM implements UserCredential {
+
+        @JsonAlias("new_password")
+        @Size(min=12, message="Password length must be 12 chars minimum!")
+        private String newPassword;
+
+        @Override
+        public String getPassword() {
+            return this.newPassword;
+        }
+    }
+  learner_created: true
+- name: src/account/models/PayrollPK.java
+  visible: true
+  text: |
+    package account.models;
+
+    import account.util.DateUtil;
+    import lombok.Data;
+    import lombok.NoArgsConstructor;
+
+    import javax.persistence.Embeddable;
+    import java.io.Serializable;
+    import java.time.LocalDate;
+
+    @Data
+    @Embeddable
+    @NoArgsConstructor
+    public class PayrollPK implements Serializable {
+        private long employeeId;
+        private LocalDate period;   // Convert to/from format: mm-YYYY e.g. 07-2022
+
+        public PayrollPK(long userId, String period) {
+            this.employeeId = userId;
+            this.period = DateUtil.mmYYYYToLocalDate(period);
+        }
+    }
+  learner_created: true
+- name: src/account/validation/BreachedPasswordException.java
+  visible: true
+  text: |
+    package account.validation;
+
+    import org.springframework.http.HttpStatus;
+    import org.springframework.web.bind.annotation.ResponseStatus;
+
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public class BreachedPasswordException extends RuntimeException {
+
+        public BreachedPasswordException() {
+            super("The password is in the hacker's database!");
+        }
+    }
+  learner_created: true
+- name: src/account/contracts/PayrollResponseCM.java
+  visible: true
+  text: |
+    package account.contracts;
+
+    import account.models.PayrollEntity;
+    import account.models.UserEntity;
+    import com.fasterxml.jackson.annotation.JsonProperty;
+    import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+    import lombok.Data;
+
+    import java.time.LocalDate;
+
+    @Data
+    @JsonPropertyOrder({"name", "lastname", "period", "salary"})
+    public class PayrollResponseCM {
+        @JsonProperty("name")
+        private String firstName;
+        @JsonProperty("lastname")
+        private String lastName;
+        private String period;
+        private String salary;
+
+        public PayrollResponseCM(PayrollEntity payrollEntity, UserEntity employee) {
+            LocalDate period = payrollEntity.getPayrollId().getPeriod();
+            String month = period.getMonth().name();
+            this.period = month.charAt(0) + month.substring(1).toLowerCase() + "-" + period.getYear();
+            this.salary = salaryToString(payrollEntity.getSalary());
+            this.firstName = employee.getFirstName();
+            this.lastName = employee.getLastName();
+        }
+
+        private static String salaryToString(long salary) {
+            return salary/100 + " dollar(s) " + salary%100 + " cent(s)";
+        }
+    }
+  learner_created: true
+- name: src/account/util/DateUtil.java
+  visible: true
+  text: |
+    package account.util;
+
+    import java.time.LocalDate;
+    import java.util.regex.Pattern;
+
+    public class DateUtil {
+
+        private static final Pattern mmYYYY = Pattern.compile("[0-1]\\d-20\\d{2}");
+
+        public static LocalDate mmYYYYToLocalDate(String input) {
+            if (!mmYYYY.matcher(input).matches())
+                throw new IllegalArgumentException("Required format: mm-YYYY");
+
+            String[] dateTokens = input.split("-");
+            final int month = Integer.parseInt(dateTokens[0]);
+            if (month>12) throw new IllegalArgumentException("Invalid month");
+            final int year = Integer.parseInt(dateTokens[1]);
+
+            LocalDate date = LocalDate.of(month < 12 ? year : year+1,
+                    month < 12 ? month+1 : 1, 1);
+            return date.minusDays(1L);
+        }
+
+        public static String locateDateTommYYYY(LocalDate input) {
+            return input.getMonth().getValue() + "-" + input.getYear();
+        }
+    }
+  learner_created: true
+- name: src/account/security/AuthorityOperation.java
+  visible: true
+  text: |
+    package account.security;
+
+    public enum AuthorityOperation {
+        GRANT, REMOVE
+    }
+  learner_created: true
+- name: src/account/controllers/ExceptionInterceptor.java
+  visible: true
+  text: |
+    package account.controllers;
+
+    import org.springframework.http.HttpHeaders;
+    import org.springframework.http.HttpStatus;
+    import org.springframework.http.ResponseEntity;
+    import org.springframework.web.bind.MethodArgumentNotValidException;
+    import org.springframework.web.bind.annotation.ControllerAdvice;
+    import org.springframework.web.context.request.WebRequest;
+    import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
+
+    import java.time.LocalDateTime;
+    import java.util.LinkedHashMap;
+    import java.util.Map;
+
+    @ControllerAdvice
+    public class ExceptionInterceptor extends ResponseEntityExceptionHandler {
+
+        @Override
+        protected ResponseEntity<Object> handleMethodArgumentNotValid(
+                MethodArgumentNotValidException ex,
+                HttpHeaders headers,
+                HttpStatus status,
+                WebRequest request) {
+
+            Map<String, Object> body = new LinkedHashMap<>();
+            body.put("status", status.value());
+            body.put("timestamp", LocalDateTime.now());
+            body.put("exception", ex.getClass());
+            return new ResponseEntity<>(body, headers, HttpStatus.BAD_REQUEST);
+        }
+    }
+  learner_created: true
+- name: src/account/controllers/AdminAPI.java
+  visible: true
+  text: |
+    package account.controllers;
+
+    import account.contracts.ModifyRoleCM;
+    import account.contracts.UserInfoCM;
+    import account.models.UserEntity;
+    import account.security.AuthorityOperation;
+    import account.services.AdminService;
+    import org.springframework.beans.factory.annotation.Autowired;
+    import org.springframework.http.HttpStatus;
+    import org.springframework.http.ResponseEntity;
+    import org.springframework.security.core.annotation.AuthenticationPrincipal;
+    import org.springframework.validation.annotation.Validated;
+    import org.springframework.web.bind.annotation.*;
+    import org.springframework.web.server.ResponseStatusException;
+
+    import javax.validation.constraints.Email;
+    import javax.validation.constraints.NotNull;
+    import javax.validation.constraints.Pattern;
+    import java.util.LinkedHashMap;
+    import java.util.List;
+    import java.util.Map;
+
+    @RestController
+    @RequestMapping("/api/admin")
+    @Validated
+    public class AdminAPI {
+
+        @Autowired
+        AdminService adminService;
+
+        @GetMapping("/user")
+        public ResponseEntity<List<UserInfoCM>> getUsers() {
+            return new ResponseEntity<>(adminService.getAllUsers(), HttpStatus.OK);
+        }
+
+        @PutMapping("/user/role")
+        public ResponseEntity<UserInfoCM> modifyRole(@RequestBody ModifyRoleCM modifyRoleCM, @AuthenticationPrincipal UserEntity admin) {
+            if(modifyRoleCM.getOperation() == AuthorityOperation.REMOVE
+                    && modifyRoleCM.getRole().equals("ADMINISTRATOR")
+                    && modifyRoleCM.getEmail().matches(admin.getUsername()))
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Can't remove ADMINISTRATOR role!");
+
+            UserInfoCM response = adminService.modifyUserRole(modifyRoleCM);
+
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        }
+
+        @DeleteMapping("/user/{email}")
+        public ResponseEntity<Map<String, String>> deleteUser(@PathVariable @NotNull @Email String email, @AuthenticationPrincipal UserEntity admin) {
+            if(admin.getUsername().equals(email))
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Can't remove ADMINISTRATOR role!");
+
+            adminService.deleteUser(email);
+
+            Map<String, String> response = new LinkedHashMap<>();
+            response.put("user", email);
+            response.put("status", "Deleted successfully!");
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        }
+    }
+  learner_created: true
+- name: src/account/security/WebSecurityConfig.java
+  visible: true
+  text: |
+    package account.security;
+
+    import org.springframework.beans.factory.annotation.Autowired;
+    import org.springframework.context.annotation.Bean;
+    import org.springframework.http.HttpMethod;
+    import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+    import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+    import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+    import org.springframework.security.config.http.SessionCreationPolicy;
+    import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+    import org.springframework.security.crypto.password.PasswordEncoder;
+    import org.springframework.security.web.access.AccessDeniedHandler;
+
+    @EnableWebSecurity
+    public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
+
+        @Autowired
+        RestAuthenticationEntryPoint restAuthEntryPoint;
+
+        @Autowired
+        AccessDeniedHandler accessDeniedHandler;
+
+        @Bean
+        PasswordEncoder passwordEncoder() {
+            return new BCryptPasswordEncoder(13);
+        }
+
+        @Override
+        protected void configure(HttpSecurity http) throws Exception {
+            http.authorizeRequests() // manage access
+                    .mvcMatchers("/api/auth/signup").permitAll()
+                    .mvcMatchers("/api/auth/changepass").authenticated()
+                    .mvcMatchers(HttpMethod.GET, "/api/empl/payment").hasAnyRole("USER", "ACCOUNTANT")
+                    .mvcMatchers("/api/acct/payments").hasRole("ACCOUNTANT")
+                    .mvcMatchers("/api/admin/**").hasRole("ADMINISTRATOR")
+                    .and().csrf().disable().headers().frameOptions().disable() // For Postman, the H2 console
+                    .and().httpBasic().authenticationEntryPoint(restAuthEntryPoint) // Handle auth error
+                    .and().exceptionHandling().accessDeniedHandler(accessDeniedHandler)
+                    .and().sessionManagement()
+                    .sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+        }
+
+    }
+  learner_created: true
+- name: src/account/models/PayrollEntity.java
+  visible: true
+  text: |
+    package account.models;
+
+    import account.contracts.PayrollCM;
+    import lombok.Data;
+    import lombok.NoArgsConstructor;
+
+    import javax.persistence.*;
+
+    @Entity
+    @Data
+    @NoArgsConstructor
+    @Table(name = "Payroll")
+    public class PayrollEntity {
+        @EmbeddedId
+        PayrollPK payrollId;
+
+        @ManyToOne @MapsId("employeeId")
+        private UserEntity employee;
+
+        @Column(nullable = false)
+        private long salary;    // In cents
+
+        public PayrollEntity(PayrollCM payroll, UserEntity user) {
+            this.payrollId = new PayrollPK(user.getPublicId(), payroll.getPeriod());
+            this.employee = user;
+            this.salary = payroll.getSalary();;
+        }
+    }
+  learner_created: true
+- name: src/account/services/PayrollService.java
+  visible: true
+  text: |
+    package account.services;
+
+    import account.contracts.PayrollCM;
+    import account.contracts.PayrollResponseCM;
+    import account.models.PayrollEntity;
+    import account.models.PayrollPK;
+    import account.models.UserEntity;
+    import account.repositories.PayrollDAO;
+    import account.repositories.UsersDAO;
+    import org.springframework.beans.factory.annotation.Autowired;
+    import org.springframework.http.HttpStatus;
+    import org.springframework.stereotype.Service;
+    import org.springframework.web.server.ResponseStatusException;
+
+    import javax.transaction.Transactional;
+    import java.util.ArrayList;
+    import java.util.List;
+    import java.util.Optional;
+
+    @Service
+    public class PayrollService {
+
+        @Autowired
+        UsersDAO usersDAO;
+
+        @Autowired
+        PayrollDAO payrollDao;
+
+        public PayrollResponseCM getPayrollEntry(String period, UserEntity employee) {
+            PayrollPK payrollKey = new PayrollPK(employee.getPublicId(), period);
+            Optional<PayrollEntity> payrollOptional = payrollDao.findById(payrollKey);
+            PayrollEntity payrollEntity = payrollOptional.orElseThrow(() ->
+                    new ResponseStatusException(HttpStatus.BAD_REQUEST, "Payroll entry not found"));
+
+            return new PayrollResponseCM(payrollEntity, employee);
+        }
+
+        public List<PayrollResponseCM> getPayrollEntries(UserEntity employee) {
+            List<PayrollResponseCM> response = new ArrayList<>();
+            List<PayrollEntity> payrollRecords = payrollDao.findAllByPayrollId_EmployeeIdOrderByPayrollId_PeriodDesc(employee.getPublicId());
+
+            for(PayrollEntity payrollRecord : payrollRecords)
+                response.add(new PayrollResponseCM(payrollRecord, employee));
+
+            return response;
+        }
+
+        @Transactional
+        public void addPayrollEntries(List<PayrollCM> payrolls) {
+            for(PayrollCM payroll : payrolls) {
+                UserEntity employee = usersDAO.findByUsername(payroll.getEmployeeEmail());
+                if(employee==null)
+                    throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Employee not found");
+
+                PayrollPK payrollKey = new PayrollPK(employee.getPublicId(), payroll.getPeriod());
+                Optional<PayrollEntity> payrollOptional = payrollDao.findById(payrollKey);
+                if(payrollOptional.isPresent())
+                    throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Payroll entry already exists");
+
+                PayrollEntity payrollEntity = new PayrollEntity(payroll, employee);
+                payrollDao.save(payrollEntity);
+            }
+        }
+
+        public void updatePayrollEntry(PayrollCM payroll) {
+            UserEntity employee = usersDAO.findByUsername(payroll.getEmployeeEmail());
+            if(employee==null)
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Employee not found");
+
+            PayrollPK payrollKey = new PayrollPK(employee.getPublicId(), payroll.getPeriod());
+            Optional<PayrollEntity> payrollOptional = payrollDao.findById(payrollKey);
+            PayrollEntity payrollEntity = payrollOptional.orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Payroll entry not found"));
+            payrollEntity.setSalary(payroll.getSalary());
+            payrollDao.save(payrollEntity);
+        }
+    }
+  learner_created: true
+- name: src/account/contracts/PasswordChangeResponseCM.java
+  visible: true
+  text: |
+    package account.contracts;
+
+    import lombok.Data;
+    import lombok.NoArgsConstructor;
+
+    @Data
+    @NoArgsConstructor
+    public class PasswordChangeResponseCM {
+
+        private static final String success = "The password has been updated successfully";
+
+        private String email;
+        private String status;
+
+        public PasswordChangeResponseCM(String email) {
+            this.email = email;
+            this.status = success;
+        }
+    }
+  learner_created: true
+- name: src/account/security/CustomAccessDeniedHandler.java
+  visible: true
+  text: |
+    package account.security;
+
+    import com.fasterxml.jackson.databind.ObjectMapper;
+    import org.springframework.security.access.AccessDeniedException;
+    import org.springframework.security.web.access.AccessDeniedHandler;
+    import org.springframework.stereotype.Component;
+
+    import javax.servlet.ServletException;
+    import javax.servlet.http.HttpServletRequest;
+    import javax.servlet.http.HttpServletResponse;
+    import java.io.IOException;
+    import java.sql.Timestamp;
+    import java.text.SimpleDateFormat;
+    import java.util.LinkedHashMap;
+    import java.util.Map;
+
+    @Component
+    public class CustomAccessDeniedHandler implements AccessDeniedHandler {
+
+        private static final SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
+
+        @Override
+        public void handle(HttpServletRequest request,
+                           HttpServletResponse response, AccessDeniedException accessDeniedException) throws IOException, ServletException {
+            response.setContentType("application/json;charset=UTF-8");
+            response.setStatus(403);
+
+            Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+
+            Map<String, Object> payload = new LinkedHashMap<>();
+            payload.put("timestamp", sdf.format(timestamp));
+            payload.put("status", 403);
+            payload.put("error", "Forbidden");
+            payload.put("message", "Access Denied!");
+            payload.put("path", request.getServletPath());
+
+            String json = new ObjectMapper().writeValueAsString(payload);
+
+            response.getWriter().write(json);
+        }
+    }
+  learner_created: true
+- name: src/account/security/RestAuthenticationEntryPoint.java
+  visible: true
+  text: |
+    package account.security;
+
+    import org.springframework.security.core.AuthenticationException;
+    import org.springframework.security.web.AuthenticationEntryPoint;
+    import org.springframework.stereotype.Component;
+
+    import javax.servlet.ServletException;
+    import javax.servlet.http.HttpServletRequest;
+    import javax.servlet.http.HttpServletResponse;
+    import java.io.IOException;
+
+    @Component
+    public class RestAuthenticationEntryPoint implements AuthenticationEntryPoint {
+
+        @Override
+        public void commence(HttpServletRequest request,
+                             HttpServletResponse response,
+                             AuthenticationException authException) throws IOException, ServletException {
+            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, authException.getMessage());
+        }
+    }
+  learner_created: true
+- name: src/account/services/AdminService.java
+  visible: true
+  text: |
+    package account.services;
+
+    import account.contracts.ModifyRoleCM;
+    import account.contracts.UserInfoCM;
+    import account.models.UserEntity;
+    import account.repositories.UsersDAO;
+    import account.security.UserRoles;
+    import org.springframework.beans.factory.annotation.Autowired;
+    import org.springframework.http.HttpStatus;
+    import org.springframework.stereotype.Service;
+    import org.springframework.web.server.ResponseStatusException;
+
+    import javax.transaction.Transactional;
+    import java.util.ArrayList;
+    import java.util.List;
+
+    @Service
+    public class AdminService {
+
+        @Autowired
+        UsersDAO usersDAO;
+
+        public UserInfoCM modifyUserRole(ModifyRoleCM modifyRoleCM) {
+            if (!usersDAO.existsByUsername(modifyRoleCM.getEmail()))
+                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found!");
+            try {
+                UserRoles.valueOf(modifyRoleCM.getRole());
+            } catch (IllegalArgumentException ex) {
+                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Role not found!");
+            }
+
+            UserEntity userEntity = usersDAO.findByUsername(modifyRoleCM.getEmail());
+
+            switch (modifyRoleCM.getOperation()) {
+                case GRANT: {
+                    if (userEntity.addRole(modifyRoleCM.getRole().toUpperCase())) usersDAO.save(userEntity);
+                    break;
+                }
+                case REMOVE: {
+                    if (!userEntity.hasRole(modifyRoleCM.getRole()))
+                        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The user does not have a role!");
+
+                    userEntity.removeRole(modifyRoleCM.getRole());
+                    usersDAO.save(userEntity);
+                    break;
+                }
+            }
+
+            return new UserInfoCM(userEntity);
+        }
+
+        public List<UserInfoCM> getAllUsers() {
+            List<UserInfoCM> users = new ArrayList<>();
+            List<UserEntity> userEntities = usersDAO.findAllByOrderByPublicIdAsc();
+
+            for(UserEntity user : userEntities)
+                users.add(new UserInfoCM(user));
+
+            return users;
+        }
+
+        @Transactional
+        public void deleteUser(String email) {
+            if(!usersDAO.existsByUsername(email))
+                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found!");
+
+            usersDAO.deleteByUsername(email);
+        }
+    }
+  learner_created: true
+- name: src/account/controllers/PayrollAPI.java
+  visible: true
+  text: |
+    package account.controllers;
+
+    import account.contracts.PayrollCM;
+    import account.models.UserEntity;
+    import account.services.PayrollService;
+    import account.validation.ContractValidator;
+    import org.springframework.beans.factory.annotation.Autowired;
+    import org.springframework.http.HttpStatus;
+    import org.springframework.http.ResponseEntity;
+    import org.springframework.security.core.annotation.AuthenticationPrincipal;
+    import org.springframework.validation.annotation.Validated;
+    import org.springframework.web.bind.annotation.*;
+    import org.springframework.web.context.request.ServletWebRequest;
+    import org.springframework.web.server.ResponseStatusException;
+
+    import javax.validation.ConstraintViolationException;
+    import javax.validation.Valid;
+    import java.util.HashMap;
+    import java.util.List;
+    import java.util.Map;
+    import java.util.Optional;
+
+    @RestController
+    @Validated
+    @RequestMapping("/api")
+    public class PayrollAPI {
+
+        @Autowired
+        PayrollService payrollService;
+
+        @GetMapping("/empl/payment")
+        ResponseEntity<Object> getEmployeePayroll(@RequestParam Optional<String> period,
+                                                  @AuthenticationPrincipal UserEntity employee) {
+            ContractValidator.validatePeriod(period.orElse(""));
+
+            Object response;
+
+            if(period.isPresent())
+                response = this.payrollService.getPayrollEntry(period.get(), employee);
+            else
+                response = this.payrollService.getPayrollEntries(employee);
+
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        }
+
+        @PostMapping("/acct/payments")
+        ResponseEntity<Map<String, Object>> getEmployeePayroll(@RequestBody @Valid List<PayrollCM> payrolls) {
+            for(PayrollCM payrollCM : payrolls) ContractValidator.validate(payrollCM);
+
+            this.payrollService.addPayrollEntries(payrolls);
+
+            Map<String, Object> response = new HashMap<>();
+            response.put("status", "Added successfully!");
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        }
+
+        @PutMapping("/acct/payments")
+        ResponseEntity<Map<String, String>> updateEmployeeSalary(@RequestBody @Valid PayrollCM payroll) {
+            ContractValidator.validate(payroll);
+
+            this.payrollService.updatePayrollEntry(payroll);
+
+            Map<String, String> response = new HashMap<>();
+            response.put("status", "Updated successfully!");
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        }
+
+        @ExceptionHandler({ConstraintViolationException.class})
+        void handleContraintViolationException(ConstraintViolationException exception,
+                                               ServletWebRequest webRequest) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid request");
+        }
+    }
+  learner_created: true
+- name: src/account/repositories/PayrollDAO.java
+  visible: true
+  text: |
+    package account.repositories;
+
+    import account.models.PayrollEntity;
+    import account.models.PayrollPK;
+    import org.springframework.data.repository.CrudRepository;
+
+    import java.util.List;
+
+    public interface PayrollDAO extends CrudRepository<PayrollEntity, PayrollPK> {
+        List<PayrollEntity> findAllByPayrollId_EmployeeIdOrderByPayrollId_PeriodDesc(long employeeId);
+    }
+  learner_created: true
+- name: src/account/validation/UserCredential.java
+  visible: true
+  text: |
+    package account.validation;
+
+    public interface UserCredential {
+
+        String getPassword();
+    }
+  learner_created: true
 feedback_link: https://hyperskill.org/learn/step/16606#comment
 status: Unchecked
 record: -1

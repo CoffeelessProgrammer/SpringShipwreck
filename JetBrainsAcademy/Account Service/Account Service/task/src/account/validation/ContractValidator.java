@@ -18,7 +18,17 @@ public class ContractValidator {
     }
 
     public static boolean validate(PayrollCM payrollCM) {
-        final int month = Integer.parseInt(payrollCM.getPeriod().split("-")[0]);
+        validatePeriod(payrollCM.getPeriod());
+        if(payrollCM.getSalary() < 0)
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Negative salary");
+
+        return true;
+    }
+
+    public static boolean validatePeriod(String period) {
+        if(period != null && period.length() == 0) return true;
+
+        final int month = Integer.parseInt(period.split("-")[0]);
         if(month > 12 || month < 1)
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid month");
 

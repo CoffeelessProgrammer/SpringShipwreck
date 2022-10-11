@@ -1,9 +1,6 @@
 package account.controllers;
 
-import account.contracts.PasswordChangeCM;
-import account.contracts.PasswordChangeResponseCM;
-import account.contracts.UserRegResponseCM;
-import account.contracts.UserRegistrationCM;
+import account.contracts.*;
 import account.models.UserEntity;
 import account.services.UserEntityManager;
 import account.validation.ContractValidator;
@@ -28,13 +25,13 @@ public class UserMgmtAPI {
     UserEntityManager usersService;
 
     @PostMapping("/signup")
-    ResponseEntity<UserRegResponseCM> userRegistration(@RequestBody @Valid UserRegistrationCM request, Errors errors) {
+    ResponseEntity<UserInfoCM> userRegistration(@RequestBody @Valid UserRegistrationCM request, Errors errors) {
         if(errors.hasFieldErrors()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, errors.getFieldError().getDefaultMessage());
         }
         ContractValidator.validatePassword(request);
         UserEntity newUser = usersService.createUser(new UserEntity(request));
-        return new ResponseEntity<UserRegResponseCM>(new UserRegResponseCM(newUser), HttpStatus.OK);
+        return new ResponseEntity<>(new UserInfoCM(newUser), HttpStatus.OK);
     }
 
     @PostMapping("/changepass")
@@ -47,7 +44,7 @@ public class UserMgmtAPI {
         PasswordChangeResponseCM response = new PasswordChangeResponseCM(user.getUsername());
         ContractValidator.validatePassword(request);
         usersService.changePassword(user.getPassword(), request.getNewPassword());
-        return new ResponseEntity<PasswordChangeResponseCM>(response, HttpStatus.OK);
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
 }

@@ -1224,9 +1224,27 @@ files:
         String getPassword();
     }
   learner_created: true
+- name: src/account/controllers/AdminAPI.java
+  visible: true
+  learner_created: true
+- name: src/account/services/AdminService.java
+  visible: true
+  learner_created: true
+- name: src/account/contracts/UserInfoCM.java
+  visible: true
+  learner_created: true
+- name: src/account/contracts/ModifyRoleCM.java
+  visible: true
+  learner_created: true
+- name: src/account/security/AuthorityOperation.java
+  visible: true
+  learner_created: true
+- name: src/account/security/Role.java
+  visible: true
+  learner_created: true
 feedback_link: https://hyperskill.org/learn/step/16604#comment
 status: Solved
 feedback:
   message: Congratulations!
   time: Mon, 10 Oct 2022 03:33:46 UTC
-record: -1
+record: 2

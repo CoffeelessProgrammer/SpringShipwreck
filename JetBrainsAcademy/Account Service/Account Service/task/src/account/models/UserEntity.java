@@ -1,10 +1,14 @@
 package account.models;
 
 import account.contracts.UserRegistrationCM;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.web.server.ResponseStatusException;
 
 import javax.persistence.*;
 import java.util.HashSet;
@@ -23,6 +27,7 @@ public class UserEntity implements UserDetails {
 
     @Column(name="email", unique=true)
     private String username;
+    @JsonIgnore
     private String password;
     private String firstName;
     private String lastName;
@@ -54,6 +59,26 @@ public class UserEntity implements UserDetails {
 
     public void setUsername(String username) {
         this.username = username.toLowerCase();
+    }
+
+    public boolean addRole(String role) {
+        if ((role.equals("ACCOUNTANT") || role.equals("USER")) && this.hasRole("ADMINISTRATOR"))
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The user cannot combine administrative and business roles!");
+        if (role.equals("ADMINISTRATOR") && (this.hasRole("USER") || this.hasRole("ACCOUNTANT")))
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The user cannot combine administrative and business roles!");
+
+        return this.authorities.add(new Authority("ROLE_" + role));
+    }
+
+    public boolean hasRole(String role) {
+        return this.authorities.contains(new Authority("ROLE_" + role));
+    }
+
+    public boolean removeRole(String role) {
+        if (this.authorities.size() < 2)
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The user must have at least one role!");
+
+        return this.authorities.remove(new Authority("ROLE_" + role));
     }
 
     //#region Booleans
