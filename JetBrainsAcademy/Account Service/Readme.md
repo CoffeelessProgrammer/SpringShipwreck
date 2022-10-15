@@ -16,9 +16,9 @@
     - [A Guide to SimpleDateFormat | Baeldung](https://www.baeldung.com/java-simple-date-format)
 
 ## Problems Encountered
-- **Issue:** JPS incremental annotation processing is disabled. Compilation results on partial recompilation may be inaccurate. ...
+- **Issue:** "JPS incremental annotation processing is disabled. Compilation results on partial recompilation may be inaccurate. ..."
     - Suggested Fix: VM flag to fix Lombok? - `-Djps.track.ap.dependencies=true` [Doesn't work]
-    - **Fix:** Manually upgraded Lombok version `1.18.12` (from Spring Boot v2.3.1) to latest version of `1.18.24`
+    - **Solution:** Manually upgraded Lombok version `1.18.12` (from Spring Boot v2.3.1) to latest version of `1.18.24`
 - **Issue:** ExceptionHandler for ConstraintViolationException being overridden by 500 error (exception from @Validated)
     - [Converting ConstraintViolationException 500 error to 400 bad request?](https://stackoverflow.com/questions/58614373/how-to-convert-constraintviolationexception-500-error-to-400-bad-request)
-    - **Fix:** Method with @ExceptionHandler must return a concrete response; it cannot throw a different exception.
+    - **Solution:** Method with @ExceptionHandler must return a concrete response; it cannot throw a different exception.

@@ -8,40 +8,32 @@ import org.springframework.http.HttpStatus;
 
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
-import java.time.ZoneId;
-import java.util.TimeZone;
 
 public class ErrorPayloadCM {
 
     private static final SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
 
-    static {
-        sdf.setTimeZone(TimeZone.getTimeZone(ZoneId.of("UTC")));
-    }
-
     @Getter
-    private String timestamp;
+    private final String timestamp;
     @Getter
-    private int status;
+    private final int status;
     @Getter
-    private String error;
+    private final String error;
     @Getter @Setter
     private String message;
     @Getter
-    private String path;    // ServletPath
+    private final String path;    // ServletPath
 
-    public ErrorPayloadCM(int status, String path) {
+    public ErrorPayloadCM(HttpStatus httpStatus, String path) {
         Timestamp timestamp = new Timestamp(System.currentTimeMillis());
         this.timestamp = sdf.format(timestamp);
         this.path = path;
         this.message = null;
-        this.status = status;
-        if(HttpStatus.resolve(status) == null)
-            throw new IllegalArgumentException("Invalid http status: " + status);
-        this.error = HttpStatus.resolve(status).getReasonPhrase();
+        this.status = httpStatus.value();
+        this.error = httpStatus.getReasonPhrase();
     }
 
-    public String toString() {
+    public String toJson() {
         try {
             return new ObjectMapper().writeValueAsString(this);
         } catch (JsonProcessingException e) {

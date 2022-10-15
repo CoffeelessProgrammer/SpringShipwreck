@@ -2,6 +2,7 @@ package account.security;
 
 import account.contracts.ErrorPayloadCM;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.stereotype.Component;
@@ -35,9 +36,9 @@ public class CustomAccessDeniedHandler implements AccessDeniedHandler {
 //
 //        String json = new ObjectMapper().writeValueAsString(payload);
 
-        ErrorPayloadCM payload = new ErrorPayloadCM(403, request.getServletPath());
+        ErrorPayloadCM payload = new ErrorPayloadCM(HttpStatus.FORBIDDEN, request.getServletPath());
         payload.setMessage("Access denied!");
 
-        response.getWriter().write(payload.toString());
+        response.getWriter().write(payload.toJson());
     }
 }
