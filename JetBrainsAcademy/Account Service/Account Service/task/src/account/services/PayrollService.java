@@ -21,14 +21,14 @@ import java.util.Optional;
 public class PayrollService {
 
     @Autowired
-    UsersDAO usersDAO;
+    private UsersDAO usersDAO;
 
     @Autowired
-    PayrollDAO payrollDao;
+    private PayrollDAO payrollDAO;
 
     public PayrollResponseCM getPayrollEntry(String period, UserEntity employee) {
         PayrollPK payrollKey = new PayrollPK(employee.getPublicId(), period);
-        Optional<PayrollEntity> payrollOptional = payrollDao.findById(payrollKey);
+        Optional<PayrollEntity> payrollOptional = payrollDAO.findById(payrollKey);
         PayrollEntity payrollEntity = payrollOptional.orElseThrow(() ->
                 new ResponseStatusException(HttpStatus.BAD_REQUEST, "Payroll entry not found"));
 
@@ -37,7 +37,7 @@ public class PayrollService {
 
     public List<PayrollResponseCM> getPayrollEntries(UserEntity employee) {
         List<PayrollResponseCM> response = new ArrayList<>();
-        List<PayrollEntity> payrollRecords = payrollDao.findAllByPayrollId_EmployeeIdOrderByPayrollId_PeriodDesc(employee.getPublicId());
+        List<PayrollEntity> payrollRecords = payrollDAO.findAllByPayrollId_EmployeeIdOrderByPayrollId_PeriodDesc(employee.getPublicId());
 
         for(PayrollEntity payrollRecord : payrollRecords)
             response.add(new PayrollResponseCM(payrollRecord, employee));
@@ -53,12 +53,12 @@ public class PayrollService {
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Employee not found");
 
             PayrollPK payrollKey = new PayrollPK(employee.getPublicId(), payroll.getPeriod());
-            Optional<PayrollEntity> payrollOptional = payrollDao.findById(payrollKey);
+            Optional<PayrollEntity> payrollOptional = payrollDAO.findById(payrollKey);
             if(payrollOptional.isPresent())
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Payroll entry already exists");
 
             PayrollEntity payrollEntity = new PayrollEntity(payroll, employee);
-            payrollDao.save(payrollEntity);
+            payrollDAO.save(payrollEntity);
         }
     }
 
@@ -68,9 +68,9 @@ public class PayrollService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Employee not found");
 
         PayrollPK payrollKey = new PayrollPK(employee.getPublicId(), payroll.getPeriod());
-        Optional<PayrollEntity> payrollOptional = payrollDao.findById(payrollKey);
+        Optional<PayrollEntity> payrollOptional = payrollDAO.findById(payrollKey);
         PayrollEntity payrollEntity = payrollOptional.orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Payroll entry not found"));
         payrollEntity.setSalary(payroll.getSalary());
-        payrollDao.save(payrollEntity);
+        payrollDAO.save(payrollEntity);
     }
 }

@@ -1,10 +1,10 @@
 package account.services;
 
 import account.contracts.ModifyRoleCM;
-import account.contracts.UserInfoCM;
+import account.contracts.response.UserInfoCM;
 import account.models.UserEntity;
 import account.repositories.UsersDAO;
-import account.security.UserRoles;
+import account.constants.UserRoles;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -18,11 +18,31 @@ import java.util.List;
 public class AdminService {
 
     @Autowired
-    UsersDAO usersDAO;
+    private UsersDAO usersDAO;
+
+
+    public List<UserInfoCM> getAllUsers() {
+        List<UserInfoCM> users = new ArrayList<>();
+        List<UserEntity> userEntities = usersDAO.findAllByOrderByPublicIdAsc();
+
+        for(UserEntity user : userEntities)
+            users.add(new UserInfoCM(user));
+
+        return users;
+    }
+
+    @Transactional
+    public void deleteUser(String email) {
+        if(!usersDAO.existsByUsername(email))
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found!");
+
+        usersDAO.deleteByUsername(email);
+    }
 
     public UserInfoCM modifyUserRole(ModifyRoleCM modifyRoleCM) {
         if (!usersDAO.existsByUsername(modifyRoleCM.getEmail()))
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found!");
+
         try {
             UserRoles.valueOf(modifyRoleCM.getRole());
         } catch (IllegalArgumentException ex) {
@@ -49,21 +69,4 @@ public class AdminService {
         return new UserInfoCM(userEntity);
     }
 
-    public List<UserInfoCM> getAllUsers() {
-        List<UserInfoCM> users = new ArrayList<>();
-        List<UserEntity> userEntities = usersDAO.findAllByOrderByPublicIdAsc();
-
-        for(UserEntity user : userEntities)
-            users.add(new UserInfoCM(user));
-
-        return users;
-    }
-
-    @Transactional
-    public void deleteUser(String email) {
-        if(!usersDAO.existsByUsername(email))
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found!");
-
-        usersDAO.deleteByUsername(email);
-    }
 }

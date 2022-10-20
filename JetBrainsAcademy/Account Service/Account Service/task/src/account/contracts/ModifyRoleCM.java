@@ -1,6 +1,6 @@
 package account.contracts;
 
-import account.security.AuthorityOperation;
+import account.constants.AuthorityOperation;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import lombok.NoArgsConstructor;

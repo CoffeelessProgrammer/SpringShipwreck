@@ -1,6 +1,5 @@
-package dev.koicreek.hellospring.logging;
+package dev.koicreek.hellospring;
 
-import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -9,7 +8,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-//@Slf4j  // Automatically generates Logger log field
+//@Slf4j  // Automatically generates 'Logger log = ...' field
 public class HelloLoggingAPI {
 
     Logger logger = LoggerFactory.getLogger(HelloLoggingAPI.class);

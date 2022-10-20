@@ -1,9 +1,9 @@
 package account.controllers;
 
 import account.contracts.ModifyRoleCM;
-import account.contracts.UserInfoCM;
+import account.contracts.response.UserInfoCM;
 import account.models.UserEntity;
-import account.security.AuthorityOperation;
+import account.constants.AuthorityOperation;
 import account.services.AdminService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -25,7 +25,7 @@ import java.util.Map;
 public class AdminAPI {
 
     @Autowired
-    AdminService adminService;
+    private AdminService adminService;
 
     @GetMapping("/user")
     public ResponseEntity<List<UserInfoCM>> getUsers() {

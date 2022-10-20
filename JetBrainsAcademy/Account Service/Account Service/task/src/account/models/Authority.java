@@ -15,7 +15,4 @@ public class Authority implements GrantedAuthority {
 
     private String authority;
 
-//    public boolean equals(String str) {
-//        return str.equals(this.authority);
-//    }
 }

@@ -1,6 +1,5 @@
-package account.contracts;
+package account.contracts.response;
 
-import account.models.Authority;
 import account.models.UserEntity;
 import lombok.Data;
 import org.springframework.security.core.GrantedAuthority;
@@ -8,7 +7,6 @@ import org.springframework.security.core.GrantedAuthority;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Set;
 
 @Data
 public class UserInfoCM {

@@ -1,18 +1,6 @@
-
-2022-10-12 10:17:52.744  INFO 4945 --- [main] dev.koicreek.hellospring.Application     : Starting Application using Java 17.0.1 on MACC02DC239MD6N with PID 4945 (/Users/ryo/Documents/Playground/Java/SpringShipwreck/01-hello-spring-boot/build/classes/java/main started by ryo in /Users/ryo/Documents/Playground/Java/SpringShipwreck/01-hello-spring-boot)
-2022-10-12 10:17:52.746  INFO 4945 --- [main] dev.koicreek.hellospring.Application     : No active profile set, falling back to 1 default profile: "default"
-2022-10-12 10:17:53.442  INFO 4945 --- [main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port(s): 8080 (http)
-2022-10-12 10:17:53.451  INFO 4945 --- [main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
-2022-10-12 10:17:53.451  INFO 4945 --- [main] org.apache.catalina.core.StandardEngine  : Starting Servlet engine: [Apache Tomcat/9.0.65]
-2022-10-12 10:17:53.519  INFO 4945 --- [main] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
-2022-10-12 10:17:53.519  INFO 4945 --- [main] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 730 ms
-2022-10-12 10:17:53.782  INFO 4945 --- [main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port(s): 8080 (http) with context path ''
-2022-10-12 10:17:53.789  INFO 4945 --- [main] dev.koicreek.hellospring.Application     : Started Application in 1.353 seconds (JVM running for 1.647)
-2022-10-12 10:17:57.102  INFO 4945 --- [http-nio-8080-exec-2] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring DispatcherServlet 'dispatcherServlet'
-2022-10-12 10:17:57.103  INFO 4945 --- [http-nio-8080-exec-2] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
-2022-10-12 10:17:57.104  INFO 4945 --- [http-nio-8080-exec-2] o.s.web.servlet.DispatcherServlet        : Completed initialization in 1 ms
-2022-10-12 10:18:07.789 TRACE 4945 --- [http-nio-8080-exec-3] d.k.hellospring.logging.HelloLoggingAPI  : A TRACE Message
-2022-10-12 10:18:07.790 DEBUG 4945 --- [http-nio-8080-exec-3] d.k.hellospring.logging.HelloLoggingAPI  : A DEBUG Message
-2022-10-12 10:18:07.790  INFO 4945 --- [http-nio-8080-exec-3] d.k.hellospring.logging.HelloLoggingAPI  : An INFO Message
-2022-10-12 10:18:07.790  WARN 4945 --- [http-nio-8080-exec-3] d.k.hellospring.logging.HelloLoggingAPI  : A WARN Message
-2022-10-12 10:18:07.790 ERROR 4945 --- [http-nio-8080-exec-3] d.k.hellospring.logging.HelloLoggingAPI  : An ERROR Message
+2022-10-20 14:44:21.393  INFO 24814 --- [Test worker] d.koicreek.hellospring.ApplicationTests  : Starting ApplicationTests using Java 17.0.1 on MACC02DC239MD6N with PID 24814 (started by ryo in /Users/ryo/Documents/Playground/Java/SpringShipwreck/01-hello-spring-boot)
+2022-10-20 14:44:21.398  INFO 24814 --- [Test worker] d.koicreek.hellospring.ApplicationTests  : No active profile set, falling back to 1 default profile: "default"
+2022-10-20 14:44:22.507  INFO 24814 --- [Test worker] d.koicreek.hellospring.ApplicationTests  : Started ApplicationTests in 1.395 seconds (JVM running for 2.243)
+2022-10-20 14:45:08.097  INFO 24827 --- [Test worker] d.koicreek.hellospring.ApplicationTests  : Starting ApplicationTests using Java 17.0.1 on MACC02DC239MD6N with PID 24827 (started by ryo in /Users/ryo/Documents/Playground/Java/SpringShipwreck/01-hello-spring-boot)
+2022-10-20 14:45:08.098  INFO 24827 --- [Test worker] d.koicreek.hellospring.ApplicationTests  : No active profile set, falling back to 1 default profile: "default"
+2022-10-20 14:45:09.042  INFO 24827 --- [Test worker] d.koicreek.hellospring.ApplicationTests  : Started ApplicationTests in 1.22 seconds (JVM running for 2.097)

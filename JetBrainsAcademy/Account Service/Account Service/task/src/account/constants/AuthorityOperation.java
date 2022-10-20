@@ -1,4 +1,4 @@
-package account.security;
+package account.constants;
 
 public enum AuthorityOperation {
     GRANT, REMOVE

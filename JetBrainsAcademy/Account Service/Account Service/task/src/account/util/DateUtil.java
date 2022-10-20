@@ -21,7 +21,7 @@ public class DateUtil {
         return date.minusDays(1L);
     }
 
-    public static String locateDateTommYYYY(LocalDate input) {
+    public static String localDateTommYYYY(LocalDate input) {
         return input.getMonth().getValue() + "-" + input.getYear();
     }
 }

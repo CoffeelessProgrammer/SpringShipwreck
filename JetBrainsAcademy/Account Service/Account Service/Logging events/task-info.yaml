@@ -820,43 +820,6 @@ files:
 
     }
   learner_created: false
-- name: src/account/contracts/UserInfoCM.java
-  visible: true
-  text: |
-    package account.contracts;
-
-    import account.models.Authority;
-    import account.models.UserEntity;
-    import lombok.Data;
-    import org.springframework.security.core.GrantedAuthority;
-
-    import java.util.ArrayList;
-    import java.util.Collections;
-    import java.util.List;
-    import java.util.Set;
-
-    @Data
-    public class UserInfoCM {
-        private long id;
-        private String name;
-        private String lastname;
-        private String email;
-        private List<String> roles;
-
-        public UserInfoCM(UserEntity userEntity) {
-            this.id = userEntity.getPublicId();
-            this.name = userEntity.getFirstName();
-            this.lastname = userEntity.getLastName();
-            this.email = userEntity.getUsername();
-            this.roles = new ArrayList<>();
-
-            for(GrantedAuthority authority : userEntity.getAuthorities())
-                this.roles.add(authority.getAuthority());
-
-            Collections.sort(roles);
-        }
-    }
-  learner_created: true
 - name: src/account/repositories/UsersDAO.java
   visible: true
   text: |
@@ -916,15 +879,6 @@ files:
 
             return true;
         }
-    }
-  learner_created: true
-- name: src/account/security/UserRoles.java
-  visible: true
-  text: |
-    package account.security;
-
-    public enum UserRoles {
-        USER, ACCOUNTANT, ADMINISTRATOR
     }
   learner_created: true
 - name: src/account/models/Authority.java
@@ -1417,15 +1371,6 @@ files:
         public static String locateDateTommYYYY(LocalDate input) {
             return input.getMonth().getValue() + "-" + input.getYear();
         }
-    }
-  learner_created: true
-- name: src/account/security/AuthorityOperation.java
-  visible: true
-  text: |
-    package account.security;
-
-    public enum AuthorityOperation {
-        GRANT, REMOVE
     }
   learner_created: true
 - name: src/account/controllers/AdminAPI.java
@@ -1982,11 +1927,66 @@ files:
         }
     }
   learner_created: true
-- name: src/account/contracts/ErrorPayloadCM.java
-  visible: true
-  learner_created: true
 - name: src/account/controllers/ExceptionInterceptor.java
   visible: true
+  learner_created: true
+- name: src/account/constants/UserRoles.java
+  visible: true
+  text: |
+    package account.security;
+
+    public enum UserRoles {
+        USER, ACCOUNTANT, ADMINISTRATOR
+    }
+  learner_created: true
+- name: src/account/constants/AuthorityOperation.java
+  visible: true
+  text: |
+    package account.security;
+
+    public enum AuthorityOperation {
+        GRANT, REMOVE
+    }
+  learner_created: true
+- name: src/account/contracts/response/ErrorPayloadCM.java
+  visible: true
+  learner_created: true
+- name: src/account/contracts/response/UserInfoCM.java
+  visible: true
+  text: |
+    package account.contracts;
+
+    import account.models.Authority;
+    import account.models.UserEntity;
+    import lombok.Data;
+    import org.springframework.security.core.GrantedAuthority;
+
+    import java.util.ArrayList;
+    import java.util.Collections;
+    import java.util.List;
+    import java.util.Set;
+
+    @Data
+    public class UserInfoCM {
+        private long id;
+        private String name;
+        private String lastname;
+        private String email;
+        private List<String> roles;
+
+        public UserInfoCM(UserEntity userEntity) {
+            this.id = userEntity.getPublicId();
+            this.name = userEntity.getFirstName();
+            this.lastname = userEntity.getLastName();
+            this.email = userEntity.getUsername();
+            this.roles = new ArrayList<>();
+
+            for(GrantedAuthority authority : userEntity.getAuthorities())
+                this.roles.add(authority.getAuthority());
+
+            Collections.sort(roles);
+        }
+    }
   learner_created: true
 feedback_link: https://hyperskill.org/learn/step/16606#comment
 status: Unchecked

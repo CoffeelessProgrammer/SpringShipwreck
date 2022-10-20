@@ -7,13 +7,13 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class PasswordChangeResponseCM {
 
-    private static final String success = "The password has been updated successfully";
+    private static final String SUCCESS = "The password has been updated successfully";
 
     private String email;
     private String status;
 
     public PasswordChangeResponseCM(String email) {
         this.email = email;
-        this.status = success;
+        this.status = SUCCESS;
     }
 }

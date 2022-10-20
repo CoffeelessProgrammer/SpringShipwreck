@@ -1,6 +1,6 @@
 package account.controllers;
 
-import account.contracts.ErrorPayloadCM;
+import account.contracts.response.ErrorPayloadCM;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;

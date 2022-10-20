@@ -2,6 +2,7 @@ package account.controllers;
 
 import account.contracts.*;
 import account.contracts.response.PasswordChangeResponseCM;
+import account.contracts.response.UserInfoCM;
 import account.models.UserEntity;
 import account.services.UserEntityManager;
 import account.validation.ContractValidator;
@@ -23,10 +24,10 @@ import javax.validation.Valid;
 public class UserMgmtAPI {
 
     @Autowired
-    UserEntityManager usersService;
+    private UserEntityManager usersService;
 
     @PostMapping("/signup")
-    ResponseEntity<UserInfoCM> userRegistration(@RequestBody @Valid UserRegistrationCM request, Errors errors) {
+    ResponseEntity<UserInfoCM> registerNewUser(@RequestBody @Valid UserRegistrationCM request, Errors errors) {
         if(errors.hasFieldErrors()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, errors.getFieldError().getDefaultMessage());
         }

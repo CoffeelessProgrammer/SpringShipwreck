@@ -15,13 +15,13 @@ import org.springframework.security.web.access.AccessDeniedHandler;
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Autowired
-    RestAuthenticationEntryPoint restAuthEntryPoint;
+    private RestAuthenticationEntryPoint restAuthEntryPoint;
 
     @Autowired
-    AccessDeniedHandler accessDeniedHandler;
+    private AccessDeniedHandler accessDeniedHandler;
 
     @Bean
-    PasswordEncoder passwordEncoder() {
+    private PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder(13);
     }
 

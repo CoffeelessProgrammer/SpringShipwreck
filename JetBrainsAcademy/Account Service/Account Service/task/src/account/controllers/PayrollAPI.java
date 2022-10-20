@@ -23,7 +23,7 @@ import java.util.Optional;
 public class PayrollAPI {
 
     @Autowired
-    PayrollService payrollService;
+    private PayrollService payrollService;
 
     @GetMapping("/empl/payment")
     ResponseEntity<Object> getEmployeePayroll(@RequestParam Optional<String> period,
@@ -41,7 +41,7 @@ public class PayrollAPI {
     }
 
     @PostMapping("/acct/payments")
-    ResponseEntity<Map<String, Object>> getEmployeePayroll(@RequestBody @Valid List<PayrollCM> payrolls) {
+    ResponseEntity<Map<String, Object>> addEmployeeSalaries(@RequestBody @Valid List<PayrollCM> payrolls) {
         for(PayrollCM payrollCM : payrolls) ContractValidator.validate(payrollCM);
 
         this.payrollService.addPayrollEntries(payrolls);

@@ -15,11 +15,13 @@ import org.springframework.web.server.ResponseStatusException;
 
 @Service
 public class UsersServiceImpl implements UserEntityManager {
-    @Autowired
-    UsersDAO usersDAO;
 
     @Autowired
-    PasswordEncoder passwordEncoder;
+    private UsersDAO usersDAO;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
 
     @Override
     public UserEntity loadUserByUsername(String username) throws UsernameNotFoundException {
