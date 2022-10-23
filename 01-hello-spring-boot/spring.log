@@ -1,6 +1,9 @@
-2022-10-20 14:44:21.393  INFO 24814 --- [Test worker] d.koicreek.hellospring.ApplicationTests  : Starting ApplicationTests using Java 17.0.1 on MACC02DC239MD6N with PID 24814 (started by ryo in /Users/ryo/Documents/Playground/Java/SpringShipwreck/01-hello-spring-boot)
-2022-10-20 14:44:21.398  INFO 24814 --- [Test worker] d.koicreek.hellospring.ApplicationTests  : No active profile set, falling back to 1 default profile: "default"
-2022-10-20 14:44:22.507  INFO 24814 --- [Test worker] d.koicreek.hellospring.ApplicationTests  : Started ApplicationTests in 1.395 seconds (JVM running for 2.243)
-2022-10-20 14:45:08.097  INFO 24827 --- [Test worker] d.koicreek.hellospring.ApplicationTests  : Starting ApplicationTests using Java 17.0.1 on MACC02DC239MD6N with PID 24827 (started by ryo in /Users/ryo/Documents/Playground/Java/SpringShipwreck/01-hello-spring-boot)
-2022-10-20 14:45:08.098  INFO 24827 --- [Test worker] d.koicreek.hellospring.ApplicationTests  : No active profile set, falling back to 1 default profile: "default"
-2022-10-20 14:45:09.042  INFO 24827 --- [Test worker] d.koicreek.hellospring.ApplicationTests  : Started ApplicationTests in 1.22 seconds (JVM running for 2.097)
+2022-10-23 10:05:55.065  INFO 3583 --- [main] d.k.s.hellospring.Application            : Starting Application using Java 17.0.1 on MACC02DC239MD6N with PID 3583 (/Users/ryo/Documents/Playground/Java/SpringShipwreck/01-hello-spring-boot/build/classes/java/main started by ryo in /Users/ryo/Documents/Playground/Java/SpringShipwreck/01-hello-spring-boot)
+2022-10-23 10:05:55.073  INFO 3583 --- [main] d.k.s.hellospring.Application            : No active profile set, falling back to 1 default profile: "default"
+2022-10-23 10:05:55.695  INFO 3583 --- [main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port(s): 8080 (http)
+2022-10-23 10:05:55.707  INFO 3583 --- [main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2022-10-23 10:05:55.707  INFO 3583 --- [main] org.apache.catalina.core.StandardEngine  : Starting Servlet engine: [Apache Tomcat/9.0.68]
+2022-10-23 10:05:55.789  INFO 3583 --- [main] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
+2022-10-23 10:05:55.789  INFO 3583 --- [main] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 671 ms
+2022-10-23 10:05:56.052  INFO 3583 --- [main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port(s): 8080 (http) with context path ''
+2022-10-23 10:05:56.060  INFO 3583 --- [main] d.k.s.hellospring.Application            : Started Application in 1.364 seconds (JVM running for 1.66)
