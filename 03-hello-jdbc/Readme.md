@@ -11,9 +11,9 @@
 - Security - Prevent SQL Injection with Parameterized Queries
     - [How does a PreparedStatement prevent SQL injection? | StackOverflow](https://stackoverflow.com/questions/1582161/how-does-a-preparedstatement-avoid-or-prevent-sql-injection)
     - [Benefits of a PreparedStatement | ChartIO](https://chartio.com/resources/tutorials/understanding-the-difference-between-a-jdbc-statement-and-prepared-statement/)
-    - [How Prepared Statements Work | SecurityJourney](https://www.securityjourney.com/post/how-to-prevent-sql-injection-vulnerabilities-how-prepared-statements-work)
     - [Preventing SQL Injection | Baeldung](https://www.baeldung.com/sql-injection)
-- [Size of a ResultSet](https://stackoverflow.com/questions/192078/how-do-i-get-the-size-of-a-java-sql-resultset)
+    - [How Prepared Statements Work | SecurityJourney](https://www.securityjourney.com/post/how-to-prevent-sql-injection-vulnerabilities-how-prepared-statements-work)
+- [Size of a ResultSet | StackOverflow](https://stackoverflow.com/questions/192078/how-do-i-get-the-size-of-a-java-sql-resultset)
 
 
 ### Archive
