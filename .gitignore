@@ -3,6 +3,7 @@
 .gradle
 build
 out
+application.properties
 
 # Mac
 .DS_Store

@@ -1,0 +1,4 @@
+spring.application.name: ConfigClient
+spring.config.import: optional:configserver:http://localhost:8888 # Default port
+
+token.secret: Default secret token

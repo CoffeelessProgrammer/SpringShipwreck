@@ -8,4 +8,4 @@
 ## Problems Encountered
 - **Issue:** User remains authenticated after logout, i.e. can still access role-gated endpoints
     - [Spring Security logout not working](https://stackoverflow.com/questions/36557294/spring-security-logout-does-not-work-does-not-clear-security-context-and-authe)
-    - **Solution:** Add `http.logout().clearAuthentication(true)` to HttpSecurity
+    - **Solution:** Set `clearAuthentication(true)` in `HttpSecurity#logout`
