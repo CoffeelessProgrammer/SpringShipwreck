@@ -1,0 +1,4 @@
+spring.security.user:
+  name: user
+  password: Password1
+#spring.cache.type: NONE
