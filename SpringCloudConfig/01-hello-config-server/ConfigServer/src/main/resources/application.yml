@@ -1,8 +1,7 @@
 server.port: 8888
 spring.application.name: ConfigServer
 
-spring.cloud.config.server.git:
-  clone-on-start: true
-  uri: https://github.com/OmnicWolf/spring-shipwreck-config
-  username: omnicwolf
-  password: <personal-access-token> # If 2FA enabled, else password
+spring.profiles.active: native  # Native means local filesystem
+spring.cloud.config.server.native.search-locations: file:///${user.home}/Documents/Playground/JavaSandbox/spring-config-local
+
+#spring.profiles.active: native, git  # Can use both together
