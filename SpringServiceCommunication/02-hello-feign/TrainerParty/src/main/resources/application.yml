@@ -1,0 +1,10 @@
+server.port: ${PORT:0}
+spring.application.name: TrainerParty-Server-V0
+server.error.include-message: always
+eureka:
+  instance:
+    preferIpAddress: true
+    hostname: ${HOSTNAME:localhost}
+    instanceId: ${eureka.instance.hostname}:${spring.application.name}:${spring.application.instance_id:${random.value}}}
+  client:
+    serviceUrl.defaultZone: http://localhost:${DISCOVERY_PORT:8761}/eureka

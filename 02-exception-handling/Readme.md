@@ -4,6 +4,7 @@
 - [@Valid and @Validated | Medium](https://medium.com/javarevisited/are-you-using-valid-and-validated-annotations-wrong-b4a35ac1bca4)
     - `MethodArgumentNotValidException`
     - `ConstraintViolationException`
+- [Spring Exception Handling | Reflectoring.io](https://reflectoring.io/spring-boot-exception-handling/)
 - [Error Handling for REST | Baeldung](https://www.baeldung.com/exception-handling-for-rest-with-spring)
 
 ## Problems Encountered

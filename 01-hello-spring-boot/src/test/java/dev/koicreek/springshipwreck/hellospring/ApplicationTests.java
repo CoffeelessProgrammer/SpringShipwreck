@@ -14,6 +14,10 @@ class ApplicationTests {
 	Environment env;
 
 	@Test
+	void contextLoads() {
+	}
+
+	@Test
 	void PropertiesConfig_WHEN_PropertiesAndYamlPresent_THEN_PropertiesOverridesYaml() {
 		final String property = env.getProperty("token.precedence");
 		System.out.println("token.precedence=" + property);

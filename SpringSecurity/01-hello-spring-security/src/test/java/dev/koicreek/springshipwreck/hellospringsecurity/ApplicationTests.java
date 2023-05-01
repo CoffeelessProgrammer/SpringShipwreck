@@ -18,6 +18,10 @@ class ApplicationTests {
 	@Autowired
 	MockMvc mvc;
 
+	@Test
+	void contextLoads() {
+	}
+
 	//#region AnonymousUser
 
 	@Test

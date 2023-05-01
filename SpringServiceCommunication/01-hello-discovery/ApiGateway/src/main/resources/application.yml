@@ -1,0 +1,51 @@
+server.port: 8000
+
+eureka:
+  instance:
+    preferIpAddress: true
+    hostname: localhost
+    instanceId: localhost:${spring.application.name}:${spring.application.instance_id:${server.port}}}
+  client:
+    serviceUrl.defaultZone: http://localhost:${DISCOVERY_PORT:8761}/eureka
+
+spring:
+  application.name: ApiGateway-Server-V0
+  cloud:
+    gateway:
+      # Automatic routing configuration
+      discovery.locator:
+        enabled: false              # default false
+        lowerCaseServiceId: true    # Requires use of lowercase app name in url requests
+      # Manual routing configuration
+      routes:
+        - id: get-pokemonsettlements-port-1
+          uri: lb://pokemonsettlements-server-v0  # 'lb' stands for load-balancer
+          predicates:
+            - Path=/port                  # External incoming url path; automatically routed to equivalent path in service uri
+            - Method=GET                  # All predicates must match request for route to be found
+          filters:
+            - RemoveRequestHeader=Cookie
+
+        - id: get-pokemonsettlements-port-2
+          uri: lb://pokemonsettlements-server-v0
+          predicates:
+            - Path=/getSettlementsPort    # Custom incoming paths must be rewritten via filter
+            - Method=GET
+          filters:
+            - RemoveRequestHeader=Cookie
+            # RewritePath=/external/incoming/url, /internal/url
+            - RewritePath=/getSettlementsPort, /port  # Map custom path to target service uri equivalent
+            
+        - id: pokemonsettlements-requests
+          uri: lb://pokemonsettlements-server-v0
+          predicates:
+            - Path=/pokemonsettlements-server-v0/**
+            - Method=HEAD,GET,POST,PUT,PATCH,DELETE
+          filters:
+            - RemoveRequestHeader=Cookie
+            - RewritePath=/pokemonsettlements-server-v0/(?<segment>.*), /$\{segment}  # Extract internal route from locator path via regex
+
+# --------------- Routes Manually Configured Above ---------------
+# GET http://localhost:8000/port
+# GET http://localhost:8000/getSettlementsPort
+# GET http://localhost:8000/pokemonsettlements-server-v0/port, http://localhost:8000/pokemonsettlements-server-v0/settlements, ...

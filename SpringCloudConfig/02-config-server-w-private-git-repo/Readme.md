@@ -3,7 +3,6 @@
 Setting up a Spring Config Server with private GitHub repository access.
 
 ## Resources
-- [Spring Cloud Config | Spring Docs](https://docs.spring.io/spring-cloud-config/docs/current/reference/html/)
 - [Config Example | Spring Cloud Samples](https://github.com/spring-cloud-samples/config-repo)
 - [Spring Cloud Config | Baeldung](https://www.baeldung.com/spring-cloud-configuration)
 

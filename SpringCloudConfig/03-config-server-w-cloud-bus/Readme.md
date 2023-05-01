@@ -7,7 +7,6 @@ Request POST on Config Server's `/actuator/busrefresh` endpoint to propagate rem
 ## Resources
 - [Spring Cloud Bus | Spring Docs](https://docs.spring.io/spring-cloud-bus/docs/current/reference/html/)
 - [RabbitMQ Installation | RabbitMQ](https://rabbitmq.com/download.html)
-- [Spring Cloud Config | Spring Docs](https://docs.spring.io/spring-cloud-config/docs/current/reference/html/)
 
 ## Problems Encountered
 - **Issue:** `405 Method Not Allowed` response when accessing `/actuator/busrefresh` endpoint on Config Server
