@@ -1,10 +1,10 @@
-# Project: Create Java Alpine Image
+# Project 0: Create Java Alpine Image
 
 ## Env Setup Notes
 - uname -m   (display architecture)
 - ~~apk update~~
 - wget -O java21.tar.gz \<url>
-    - Alpine - https://github.com/adoptium/temurin21-binaries/releases/download/jdk-21.0.7%2B6/OpenJDK21U-jre_x64_alpine-linux_hotspot_21.0.7_6.tar.gz
+  - Alpine - https://github.com/adoptium/temurin21-binaries/releases/download/jdk-21.0.7%2B6/OpenJDK21U-jre_x64_alpine-linux_hotspot_21.0.7_6.tar.gz
 - tar -xf java21.tar.gz
 - rm java21.tar.gz
 - export PATH=$PATH:/home/public/jdk-21.0.7+6-jre/bin

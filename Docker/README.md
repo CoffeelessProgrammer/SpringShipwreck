@@ -24,3 +24,8 @@
 
 ## Course - Docker Masterclass For Java Spring Boot Developers
 - Instructor Repo - [vinsguru/docker-spring-webflux](https://github.com/vinsguru/docker-spring-webflux)
+
+## Reading
+- [debian:slim vs. alpine](https://groups.google.com/g/golang-nuts/c/15TLaxqUpA0)
+  - Debian=glibc; Alpine=libmusl (underlying C libraries)
+- [Benchmarking Debian vs Alpine](https://nickjanetakis.com/blog/benchmarking-debian-vs-alpine-as-a-base-docker-image)
