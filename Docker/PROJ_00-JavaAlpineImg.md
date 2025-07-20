@@ -1,6 +1,6 @@
 # Project 0: Create Java Alpine Image
 
-## Env Setup Notes
+## Setup Notes
 - uname -m   (display architecture)
 - ~~apk update~~
 - wget -O java21.tar.gz \<url>

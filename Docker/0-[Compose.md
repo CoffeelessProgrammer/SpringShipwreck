@@ -8,7 +8,7 @@
   - up/down
     - `-d` - run in background (daemon)
     - `-f <custom-name>.yaml`
-  - ps ∙∙∙∙∙∙∙∙∙∙∙ logs
+  - ps ∙∙∙∙∙∙∙∙∙∙∙ logs \[service-name]
 
 ## compose.yaml (docker-componse.yaml)
 

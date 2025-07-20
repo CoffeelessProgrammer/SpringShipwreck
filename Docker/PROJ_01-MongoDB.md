@@ -3,7 +3,7 @@
 - [mongo | Docker Hub](https://hub.docker.com/_/mongo#initializing-a-fresh-instance)
 - [mongo-express | Docker Hub](https://hub.docker.com/_/mongo-express)
 
-## Env Setup Notes
+## Setup Notes
 - Req. Env Variables
   - mongo
     - MONGO_INITDB_ROOT_USERNAME

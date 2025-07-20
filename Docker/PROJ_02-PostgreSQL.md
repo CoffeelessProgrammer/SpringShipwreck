@@ -1,46 +1,59 @@
 # Project 02: Create PostgreSQL Database via Docker Compose
 
-- [mongo | Docker Hub](https://hub.docker.com/_/mongo#initializing-a-fresh-instance)
+- [postgres | Docker Hub](https://hub.docker.com/_/postgres#initialization-scripts)
+- [adminer | Docker Hub](https://hub.docker.com/_/adminer)
 
-## Env Setup Notes
+## Setup Notes
+- Env Variables
+  - postgres
+    - POSTGRES_DB
+    - POSTGRES_USER
+    - POSTGRES_PASSWORD
 
+### PostgreSQL Data Init Script
+- [PostgreSQL Docs](https://www.postgresql.org/docs/current/app-initdb.html)
 
+```sql
+-- ./data/init-postgres-data.sql
+
+CREATE TABLE product(
+  id SERIAL PRIMARY KEY,
+  name VARCHAR(50),
+  price NUMERIC(10,2) NOT NULL
+);
+
+INSERT INTO product(name, price)
+VALUES
+  ('Galaxy Note', 920.75),
+  ('Galaxy Tab', 649.50);
+```
 
 ## docker-compose.yaml
+- `/var/lib/postgresql/data` - Def. data storage location (for volume mapping)
 - `/docker-entrypoint-initdb.d` - Scripts in location will be run on db initialization
 
 ```yaml
 services:
-  db-mongo:
-    image: mongo
-    environment:
-      MONGO_INITDB_ROOT_USERNAME: admin
-      MONGO_INITDB_ROOT_PASSWORD: pass
+  db-postgres:
+    image: postgres
     volumes:
-    - ./data:docker-entrypoint-initdb.d
-  ui-mongo-express:
-    image: mongo-express
-    depends_on:
-    - db-mongo
-    restarts: always
-    ports:
-    - "8081:8081"
+    - ./data:/docker-entrypoint-initdb.d
     environment:
-    - ME_CONFIG_MONGODB_SERVER=db-mongo
-    - ME_CONFIG_MONGODB_ADMINUSERNAME=admin
-    - ME_CONFIG_MONGODB_ADMINPASSWORD=pass
+    - POSTGRES_DB=product_db
+    - POSTGRES_USER=admin
+    - POSTGRES_PASSWORD=pass
+  adminer:
+    image: adminer
+    ports:
+    - "8080:8080"
 ```
+
+### Env Properties
 
 ```properties
-# COMMENTED_PROP=1
+# --- PostgreSQL -------------
+POSTGRES_DB=product_db
+POSTGRES_USER=admin
+POSTGRES_PASSWORD=pass
 ```
-
 _____
-
-## Challenges Encountered
-1. **Context:** <br>**Error:** <br>**Obs:** 
-    - **Solution:** 
-    - **!REF**
-1. **Context:** <br>**Issue:** <br>**Obs:** 
-    - **Solution:** 
-    - **!REF**
